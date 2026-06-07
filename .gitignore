@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.env
+*.db
+.DS_Store
+.idea/
+.vscode/
+*.egg-info/
+dist/
+build/
+reports/generated/*.pdf
+!reports/generated/.gitkeep
+# models/saved/*.joblib
+!models/saved/.gitkeep
+.streamlit/secrets.toml
