@@ -51,5 +51,5 @@ def accreditation_to_score(grade: str, grade_map: dict) -> float:
 def nirf_to_score(rank: float) -> float:
     """Lower NIRF rank is better; convert to 0-100 score."""
     if pd.isna(rank) or rank <= 0:
-        return 50.0
+        return 0.0
     return max(0.0, min(100.0, 100 - (float(rank) / 10)))

@@ -16,6 +16,5 @@ dist/
 build/
 reports/generated/*.pdf
 !reports/generated/.gitkeep
-# models/saved/*.joblib
 !models/saved/.gitkeep
 .streamlit/secrets.toml

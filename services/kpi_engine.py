@@ -53,10 +53,10 @@ class KPIEngine:
         ).round(2)
 
         work["overall_performance_index"] = (
-            work["academic_score"] * 0.20
+            work["academic_score"] * 0.25
             + work["research_score"] * 0.20
-            + work["placement_score"] * 0.20
-            + work["infrastructure_score_kpi"] * 0.15
+            + work["placement_score"] * 0.25
+            + work["infrastructure_score_kpi"] * 0.05
             + work["faculty_score"] * 0.15
             + work["accreditation_score"] * 0.10
         ).round(2)

@@ -5,29 +5,124 @@ from app.ui_common import load_data, page_header, render_kpi_cards, render_sampl
 from auth.session import get_current_user
 from config.settings import APP_SUBTITLE
 
-
 def render():
-    page_header("Home", APP_SUBTITLE)
     user = get_current_user()
-    st.write(f"Welcome, **{user.get('username', 'User')}** ({user.get('role', 'guest')}).")
-
-    st.markdown("""
-    Use the **sidebar** to navigate modules:
-    - **Dashboard** — KPI metrics and charts
-    - **Data Management** — Upload and process institutional data
-    - **KPI Overview** — Detailed performance scores
-    - **Rankings** — Weighted institutional rankings
-    - **ML Predictions** — Performance and accreditation forecasts
-    - **Recommendations** — Actionable improvement suggestions
-    - **Benchmarking** — State and national comparisons
-    - **AI Insights** — Automated narrative insights
-    - **Reports** — PDF export
-    """)
 
     data = load_data()
-    show_data_banner(data)
-    st.subheader("System Overview")
-    render_kpi_cards(data["institutions"], data["kpis"])
+    inst_df = data["institutions"]
+    kpi_df = data["kpis"]
 
-    st.subheader("Quick KPI Preview")
-    render_sample_bar_chart(data["kpis"], "Sample Institution KPI Breakdown")
+    total_inst = len(inst_df)
+    total_students = int(inst_df["student_enrollment"].sum())
+    total_faculty = int(inst_df["faculty_count"].sum())
+    avg_placement = round(inst_df["placement_percentage"].mean(), 2)
+
+    st.markdown("""
+    # 🎓 Institutional Performance Analytics Platform
+
+    ### AI-Powered Higher Education Benchmarking & Ranking System
+
+    Analyze • Benchmark • Predict • Improve
+    """)
+
+    st.success(
+        f"👋 Welcome {user.get('username','User')} | Role: {user.get('role','Admin').upper()}"
+    )
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        st.metric("🏫 Institutions", total_inst)
+
+    with c2:
+        st.metric("🎓 Students", f"{total_students:,}")
+
+    with c3:
+        st.metric("👨‍🏫 Faculty", f"{total_faculty:,}")
+
+    with c4:
+        st.metric("📈 Avg Placement", f"{avg_placement}%")
+
+    st.markdown("---")
+
+    show_data_banner(data)
+
+    st.markdown("## 📊 System Performance Overview")
+    render_kpi_cards(inst_df, kpi_df)
+
+    st.markdown("---")
+
+    st.markdown("## 🚀 Platform Modules")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.info("""
+        📊 **Dashboard**
+
+        Interactive analytics, KPI trends and visual insights.
+        """)
+
+        st.info("""
+        🏆 **Rankings**
+
+        Institution ranking based on weighted KPI scores.
+        """)
+
+        st.info("""
+        🤖 **ML Predictions**
+
+        Forecast future institutional performance.
+        """)
+
+    with col2:
+        st.info("""
+        📂 **Data Management**
+
+        Upload and process institutional datasets.
+        """)
+
+        st.info("""
+        📈 **KPI Overview**
+
+        Academic, Research and Placement KPIs.
+        """)
+
+        st.info("""
+        🎯 **Recommendations**
+
+        AI-generated improvement suggestions.
+        """)
+
+    with col3:
+        st.info("""
+        📋 **Benchmarking**
+
+        Compare institutions nationally and state-wise.
+        """)
+
+        st.info("""
+        💡 **AI Insights**
+
+        Automated performance analysis.
+        """)
+
+        st.info("""
+        📄 **Reports**
+
+        Export analytical reports.
+        """)
+
+    st.markdown("---")
+
+    st.markdown("## 📉 Quick KPI Preview")
+    render_sample_bar_chart(
+        kpi_df,
+        "Institution Performance Snapshot"
+    )
+
+    st.markdown("---")
+
+    st.caption(
+        "SIH 2025 | AICTE, UGC, NAAC & NIRF Institutional Analytics Platform"
+    )
