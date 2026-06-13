@@ -49,8 +49,8 @@ def render():
     st.info("""
     **Ranking Formula**
 
-    Academic (20%) • Research (20%) • Placement (20%) •
-    Infrastructure (15%) • Faculty (15%) • Accreditation (10%)
+    Academic (25%) • Research (20%) • Placement (25%) •
+    Infrastructure (5%) • Faculty (15%) • Accreditation (10%)
     """)
 
     st.markdown("## 📈 Top Performing Institutions")

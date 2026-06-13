@@ -3,7 +3,6 @@ import pandas as pd
 
 from config.settings import RANKING_WEIGHTS
 
-
 class RankingEngine:
     @staticmethod
     def apply_rankings(kpi_df: pd.DataFrame) -> pd.DataFrame:
