@@ -1,281 +1,330 @@
-Institutional Performance Analytics System
-Data-Driven Decision Intelligence Platform for Higher Education Institutions
+# 🎓 Institutional Performance Analytics
 
-The Institutional Performance Analytics System is an end-to-end analytics and decision-support platform designed to evaluate, benchmark, predict, and improve institutional performance across higher education ecosystems.
+An AI-powered Institutional Performance Analytics platform designed to evaluate, benchmark, rank, and analyze higher education institutions using academic, research, placement, faculty, accreditation, and infrastructure KPIs.
 
-The platform integrates data from multiple regulatory and ranking frameworks including NIRF, AISHE, NAAC, and UGC, transforming fragmented educational datasets into actionable intelligence through analytics, machine learning, benchmarking, and automated reporting.
+## 🌐 Live Demo
 
-Built as a unified institutional intelligence platform, the system enables administrators, policymakers, accreditation bodies, and academic leaders to make informed decisions using real-time performance insights and predictive analytics.
+**Deployed Application:**
+https://institutional-performance-analytics-system-ujfv7cfx2uwpefuuzdb.streamlit.app
 
-Problem Statement
+---
 
-Higher education institutions generate significant volumes of academic, research, accreditation, infrastructure, and placement data. However, these datasets are often distributed across independent systems and reporting frameworks.
+## 📌 Project Overview
 
-This creates several challenges:
+Institutional Performance Analytics is a data-driven platform that helps educational institutions assess their performance using multiple Key Performance Indicators (KPIs).
 
-Lack of centralized performance monitoring
-Limited visibility into institutional strengths and weaknesses
-Difficulty benchmarking against state and national standards
-Reactive accreditation preparation processes
-Absence of predictive decision-support mechanisms
-Manual generation of performance reports
+The system integrates institutional datasets from official sources and generates:
 
-The Institutional Performance Analytics System addresses these challenges by providing a centralized platform capable of measuring, comparing, predicting, and improving institutional performance.
+* Institutional Rankings
+* KPI Analytics
+* Benchmarking Reports
+* Performance Insights
+* Recommendation Engine Outputs
+* Machine Learning Predictions
 
-Key Capabilities
-Analytics Dashboard
+The project was developed as a Final Year Engineering Project under the Smart India Hackathon (SIH) problem statement for Institutional Analytics.
 
-Comprehensive institutional performance monitoring through interactive visual analytics.
+---
 
-Features:
+## 🚀 Key Features
 
-Academic Performance Tracking
-Research Output Analysis
-Placement Performance Monitoring
-Infrastructure Assessment
-Faculty Performance Evaluation
-Accreditation Status Monitoring
-Composite KPI Analytics
-Data Engineering & ETL Pipeline
+### 📊 KPI Analytics
 
-Automated ingestion, transformation, validation, and consolidation of institutional datasets.
+Analyze institutions using:
 
-Integrated Sources:
+* Academic Score
+* Research Score
+* Placement Score
+* Faculty Score
+* Infrastructure Score
+* Accreditation Score
 
-Source	Purpose
-NIRF	National Institutional Rankings
-AISHE	Educational Statistics
-NAAC	Accreditation Data
-UGC	Institutional Registry
+### 🏆 Ranking Engine
 
-Pipeline Components:
+Generate institution rankings using a weighted composite score:
 
-Data Ingestion
-Data Cleaning
-Schema Standardization
-Missing Value Handling
-Dataset Consolidation
-Feature Engineering
-Analytics Database Generation
-KPI Computation Engine
+| KPI                  | Weight |
+| -------------------- | ------ |
+| Academic Score       | 25%    |
+| Research Score       | 20%    |
+| Placement Score      | 25%    |
+| Infrastructure Score | 5%     |
+| Faculty Score        | 15%    |
+| Accreditation Score  | 10%    |
 
-Computes institutional performance indicators across multiple dimensions:
+### 📈 Benchmarking
 
-Academic Excellence
-Research Productivity
-Placement Performance
-Infrastructure Quality
-Faculty Strength
-Accreditation Readiness
+Compare institutions against:
 
-These metrics form the foundation for rankings, benchmarking, recommendations, and predictive analytics.
+* National Average
+* State Average
+* Top Performing Institutions
 
-Institutional Ranking System
+### 🤖 Recommendation Engine
 
-Weighted ranking framework designed to evaluate institutional performance objectively.
+Rule-based recommendation system that identifies weak KPI areas and generates actionable institutional improvement suggestions.
 
-Ranking Methodology:
+### 🔮 ML Predictions
 
-Metric	Weight
-Academic Performance	25%
-Placement Performance	25%
-Research Output	20%
-Infrastructure	15%
-Faculty Quality	10%
-Accreditation	5%
+Machine Learning module for institutional performance forecasting and trend analysis.
 
-Outputs:
+### 📋 Reporting
 
-National Rankings
-Top 10 Institutions
-Top 50 Institutions
-Complete Ranking Tables
-Comparative Analysis
-Machine Learning Intelligence
+Generate institutional performance reports and KPI summaries.
 
-The platform incorporates supervised machine learning models to generate institutional forecasts and predictive insights.
+---
 
-Models Implemented:
+## 🏗️ System Architecture
 
-Model	Purpose
-Random Forest Regressor	Performance Score Prediction
-Random Forest Classifier	Accreditation Readiness Prediction
-Random Forest Classifier	Ranking Category Classification
+Raw Data Sources
 
-Prediction Capabilities:
+↓
 
-Institutional Performance Forecasting
-Accreditation Readiness Assessment
-Ranking Category Prediction
-Performance Risk Identification
+ETL Pipeline
+
+↓
+
+Data Cleaning & Validation
+
+↓
+
+SQLite Database
+
+↓
+
+KPI Engine
+
+↓
+
+Ranking Engine
+
+↓
+
+Benchmarking Engine
+
+↓
+
 Recommendation Engine
 
-Automatically identifies performance gaps and generates targeted improvement strategies.
+↓
 
-Recommendation Domains:
+Machine Learning Models
 
-Academic Quality
-Research Development
-Faculty Enhancement
-Infrastructure Improvement
-Placement Growth
-Accreditation Preparedness
+↓
 
-The recommendation system converts analytics into actionable institutional strategies.
+Interactive Dashboard
 
-Benchmarking Framework
+---
 
-Enables comparative evaluation against:
+## 📚 Data Sources
 
-National Averages
-State-Level Averages
-Top Performing Institutions
+The platform integrates higher education datasets from:
 
-Analysis Includes:
+* NIRF (National Institutional Ranking Framework)
+* AISHE (All India Survey on Higher Education)
+* NAAC Accreditation Records
+* UGC Institution Data
+* AKTU Engineering Colleges Dataset
 
-Performance Gap Assessment
-KPI Comparison
-Ranking Comparison
-Strategic Improvement Areas
-AI-Generated Insights
+---
 
-Transforms quantitative metrics into human-readable institutional narratives.
+## 📊 KPI Methodology
 
-Examples:
+### Academic Score
 
-Performance strengths and weaknesses
-Benchmark comparison summaries
-Accreditation readiness observations
-Ranking trend interpretations
-Strategic improvement recommendations
-Automated PDF Reporting
+Academic Score =
 
-One-click generation of institutional performance reports.
+0.6 × Enrollment Score
 
-Generated Reports Include:
+*
 
-Institutional Profile
-KPI Summary
-Ranking Information
-Machine Learning Predictions
-Benchmark Analysis
-AI Insights
-Recommendations
+0.4 × NIRF Score
 
-Suitable for:
+---
 
-Accreditation Reviews
-Administrative Meetings
-Strategic Planning
-Institutional Audits
-System Architecture
-NIRF Data
-AISHE Data
-NAAC Data
-UGC Data
-      │
-      ▼
-Data Ingestion Layer
-      │
-      ▼
-ETL & Validation Pipeline
-      │
-      ▼
-SQLite Analytics Database
-      │
-      ├── KPI Engine
-      ├── Ranking Engine
-      ├── ML Models
-      ├── Benchmarking Engine
-      └── Recommendation Engine
-              │
-              ▼
-Analytics Dashboard
-AI Insights
-PDF Reports
-Technology Stack
-Backend
-Python
-Data Processing
-Pandas
-NumPy
-Machine Learning
-Scikit-Learn
-Random Forest Models
-Database
-SQLite
-Visualization
-Plotly
-Frontend
-Streamlit
-Reporting
-ReportLab
-Project Structure
-app/
-auth/
-config/
-data/
-database/
-models/
-reports/
-scripts/
-services/
-tests/
-utils/
-run.py
-Installation
+### Research Score
+
+Calculated using normalized research publication counts.
+
+---
+
+### Placement Score
+
+Placement Score = Placement Percentage
+
+---
+
+### Faculty Score
+
+Calculated using normalized faculty strength indicators.
+
+---
+
+### Accreditation Score
+
+Mapped from NAAC accreditation grades.
+
+| Grade | Score |
+| ----- | ----- |
+| A++   | 100   |
+| A+    | 90    |
+| A     | 80    |
+| B++   | 70    |
+| B+    | 60    |
+| B     | 50    |
+
+---
+
+### Overall Performance Index
+
+Overall Performance Index =
+
+(Academic × 25%)
+
+*
+
+(Research × 20%)
+
+*
+
+(Placement × 25%)
+
+*
+
+(Infrastructure × 5%)
+
+*
+
+(Faculty × 15%)
+
+*
+
+(Accreditation × 10%)
+
+---
+
+## 🛠️ Technology Stack
+
+### Frontend
+
+* Streamlit
+* Plotly
+
+### Backend
+
+* Python
+
+### Database
+
+* SQLite
+
+### Data Processing
+
+* Pandas
+* NumPy
+
+### Machine Learning
+
+* Scikit-Learn
+
+### ORM
+
+* SQLAlchemy
+
+### Deployment
+
+* Streamlit Community Cloud
+
+---
+
+## 📂 Project Structure
+
+```text
+Institutional-Performance-Analytics/
+│
+├── app/
+├── services/
+├── database/
+├── config/
+├── scripts/
+├── data/
+│   ├── raw/
+│   ├── processed/
+│   └── seed/
+│
+├── models/
+├── utils/
+├── run.py
+├── requirements.txt
+└── README.md
+```
+
+## ⚙️ Installation
 
 Clone the repository:
 
-git clone https://github.com/utkarsh-0106/Institutional-Performance-Analytics-System.git
+```bash
+git clone https://github.com/YOUR_USERNAME/Institutional-Performance-Analytics.git
+cd Institutional-Performance-Analytics
+```
 
-cd Institutional-Performance-Analytics-System
+Create virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
 
 Install dependencies:
 
+```bash
 pip install -r requirements.txt
+```
 
 Run the application:
 
-python run.py
+```bash
+streamlit run run.py
+```
 
-Access the dashboard:
+---
 
-http://localhost:8502
-Engineering Highlights
-End-to-End Data Pipeline Development
-Institutional Analytics Framework
-Machine Learning Integration
-KPI Computation Engine
-Weighted Ranking Algorithm
-Recommendation Generation Engine
-Benchmarking System
-Automated Report Generation
-Role-Based Authentication
-Interactive Analytical Dashboards
-Future Enhancements
-Deep Learning Based Prediction Models
-Multi-Year Trend Forecasting
-Real-Time Data Synchronization
-Institution-to-Institution Comparative Analysis
-REST API Integration
-Cloud Deployment Architecture
-LLM-Powered Strategic Advisory Assistant
-Author
+## 🎯 Project Highlights
 
-Utkarsh Maheshwari
+* Integrated 160+ institutional records
+* Multi-source educational data integration
+* KPI-driven ranking methodology
+* Rule-based recommendation engine
+* Interactive analytics dashboard
+* Cloud-deployed production application
+* Real-world higher education analytics use case
 
-Designed and developed independently, including:
+---
 
-System Architecture
-Database Design
-ETL Development
-Data Engineering
-Machine Learning Models
-Analytics Framework
-Ranking Engine
-Benchmarking Module
-Recommendation System
-Dashboard Development
-PDF Reporting System
-Testing & Deployment
+## 🔮 Future Enhancements
+
+* Institution Comparison Module
+* Advanced Predictive Analytics
+* AI-Based Insight Generation
+* PDF Report Export
+* Interactive Geographic Analytics
+* Multi-User Role Management
+* Automated Data Refresh Pipelines
+
+---
+
+## 👨‍💻 Author
+
+**Utkarsh Maheshwari**
+
+Final Year Engineering Student
+
+Specialization: Data Analytics, Machine Learning, Software Development
+
+GitHub: https://github.com/utkarsh-0106
+
+---
+
+## 📄 License
+
+This project is developed for educational and research purposes as part of a Final Year Engineering Project.
