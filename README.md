@@ -284,7 +284,7 @@ pip install -r requirements.txt
 Run the application:
 
 ```bash
-streamlit run run.py
+python run.py
 ```
 
 ---
