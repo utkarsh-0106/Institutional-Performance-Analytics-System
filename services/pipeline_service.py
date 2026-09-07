@@ -71,9 +71,10 @@ class PipelineService:
         return result
 
     def ingest_and_process(self, df: pd.DataFrame) -> dict:
+        quality_report = DataValidationService.quality_report(df)
         valid, errors = DataValidationService.validate(df)
         if not valid:
-            return {"success": False, "errors": errors}
+            return {"success": False, "errors": errors, "quality_report": quality_report}
 
         cleaned = DataCleaningService.clean(df)
 
@@ -81,7 +82,9 @@ class PipelineService:
             InstitutionRepository.bulk_upsert_from_dataframe(session, cleaned)
             inst_df = InstitutionRepository.to_dataframe(session)
 
-        return self._run_analytics_pipeline(inst_df)
+        result = self._run_analytics_pipeline(inst_df)
+        result["quality_report"] = quality_report
+        return result
 
     def reprocess_existing(self) -> dict:
         with get_db_session() as session:

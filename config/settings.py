@@ -54,6 +54,15 @@ COLUMN_ALIASES = {
     "NIRF Rank": "nirf_rank",
 }
 
+NUMERIC_RANGES = {
+    "student_enrollment": (0, 100000),
+    "faculty_count": (0, 5000),
+    "placement_percentage": (0, 100),
+    "research_publications": (0, 10000),
+    "infrastructure_score": (0, 100),
+    "nirf_rank": (1, 999),
+}
+
 # Intended overall / ranking mix (KPIEngine + RankingEngine).
 RANKING_WEIGHTS = {
     "academic": 0.25,

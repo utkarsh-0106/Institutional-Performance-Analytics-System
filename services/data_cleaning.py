@@ -1,7 +1,7 @@
 """Data cleaning and preprocessing."""
 import pandas as pd
 
-from config.settings import ACCREDITATION_GRADE_MAP
+from config.settings import ACCREDITATION_GRADE_MAP, NUMERIC_RANGES
 from services.data_validation import DataValidationService
 
 
@@ -25,12 +25,18 @@ class DataCleaningService:
         for col, default in numeric_defaults.items():
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(default)
 
-        df["placement_percentage"] = df["placement_percentage"].clip(0, 100)
-        df["infrastructure_score"] = df["infrastructure_score"].clip(0, 100)
-        df["student_enrollment"] = df["student_enrollment"].clip(0, 100000).astype(int)
-        df["faculty_count"] = df["faculty_count"].clip(0, 5000).astype(int)
-        df["research_publications"] = df["research_publications"].clip(0, 10000).astype(int)
-        df["nirf_rank"] = df["nirf_rank"].clip(1, 999).astype(int)
+        lo, hi = NUMERIC_RANGES["placement_percentage"]
+        df["placement_percentage"] = df["placement_percentage"].clip(lo, hi)
+        lo, hi = NUMERIC_RANGES["infrastructure_score"]
+        df["infrastructure_score"] = df["infrastructure_score"].clip(lo, hi)
+        lo, hi = NUMERIC_RANGES["student_enrollment"]
+        df["student_enrollment"] = df["student_enrollment"].clip(lo, hi).astype(int)
+        lo, hi = NUMERIC_RANGES["faculty_count"]
+        df["faculty_count"] = df["faculty_count"].clip(lo, hi).astype(int)
+        lo, hi = NUMERIC_RANGES["research_publications"]
+        df["research_publications"] = df["research_publications"].clip(lo, hi).astype(int)
+        lo, hi = NUMERIC_RANGES["nirf_rank"]
+        df["nirf_rank"] = df["nirf_rank"].clip(lo, hi).astype(int)
 
         df["accreditation_grade"] = (
             df["accreditation_grade"].astype(str).str.strip().str.upper()

@@ -13,6 +13,36 @@ from services.etl.pipeline import ETLPipeline
 from services.pipeline_service import PipelineService
 
 
+def _show_quality_report(report: dict) -> None:
+    if not report:
+        return
+    status = report.get("status", "")
+    st.subheader("Data Quality Summary")
+    if status == "PASS":
+        st.success(f"Status: {status}")
+    elif status == "WARNING":
+        st.warning(f"Status: {status}")
+    else:
+        st.error(f"Status: {status}")
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Rows", report.get("row_count", 0))
+    c2.metric("Duplicate institutions", report.get("duplicate_institution_count", 0))
+    missing_cols = report.get("missing_required_columns") or []
+    c3.metric("Missing required columns", len(missing_cols))
+    if missing_cols:
+        st.caption("Missing: " + ", ".join(missing_cols))
+    with st.expander("Quality details"):
+        st.json(
+            {
+                "missing_value_counts": report.get("missing_value_counts", {}),
+                "invalid_numeric_counts": report.get("invalid_numeric_counts", {}),
+                "out_of_range_counts": report.get("out_of_range_counts", {}),
+                "errors": report.get("errors", []),
+            }
+        )
+
+
 def render():
     page_header("Data Management", "NIRF, AISHE, NAAC, UGC ingestion and analytics pipeline")
 
@@ -20,6 +50,9 @@ def render():
     show_data_banner(data)
     st.write(f"Current records in view: **{len(data['institutions'])}** institutions")
     render_kpi_cards(data["institutions"], data["kpis"])
+
+    if st.session_state.get("data_quality_report"):
+        _show_quality_report(st.session_state["data_quality_report"])
 
     if not is_admin():
         st.info("Institution users have read-only access. Contact admin for data uploads.")
@@ -83,12 +116,15 @@ def render():
                 if st.button("Upload & Process", type="primary", key=widget_key("data_mgmt", "upload_btn")):
                     with st.spinner("Validating and processing..."):
                         result = PipelineService().load_uploaded_file(tmp_path, file_type)
+                    if result.get("quality_report"):
+                        st.session_state.data_quality_report = result["quality_report"]
                     if result.get("success"):
                         st.success(f"Processed {result['institutions']} institutions.")
                         st.session_state.pipeline_initialized = False
                         st.rerun()
                     else:
                         st.error(result.get("errors", ["Processing failed"]))
+                        _show_quality_report(result.get("quality_report") or {})
         else:
             st.warning("Upload restricted to Admin role.")
 
@@ -98,14 +134,18 @@ def render():
         if st.button("Initialize / Reprocess All Data", type="primary", key=widget_key("data_mgmt", "pipeline_btn")):
             with st.spinner("Running pipeline..."):
                 result = PipelineService().initialize_system()
+            if result.get("quality_report"):
+                st.session_state.data_quality_report = result["quality_report"]
             if result.get("success"):
                 st.success(f"Done — source: **{result.get('data_source', 'unknown')}**")
                 st.metric("Institutions Processed", result["institutions"])
                 st.session_state.pipeline_initialized = True
                 if result.get("ml_metrics"):
                     st.json(result["ml_metrics"])
+                _show_quality_report(result.get("quality_report") or {})
             else:
                 st.error(result.get("errors", ["Pipeline failed"]))
+                _show_quality_report(result.get("quality_report") or {})
 
         st.caption("Ingest computes KPIs, rankings, and recommendations. ML training is a separate step.")
         if st.button("Train ML Models", key=widget_key("data_mgmt", "train_ml_btn")):
