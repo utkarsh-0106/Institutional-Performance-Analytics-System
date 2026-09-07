@@ -6,28 +6,22 @@ from app.ui_common import (
     load_data,
     page_header,
     render_top_institutions_bar,
+    section_panel,
     show_data_banner,
     widget_key,
 )
 from config.settings import RANKING_WEIGHTS
 from services.ranking_engine import RankingEngine
 
+
 def render():
     page_header(
         "Institution Rankings",
-        "Weighted Ranking Framework for Higher Education Institutions",
+        "Weighted ranking framework for higher education institutions",
     )
-
-    st.markdown("""
-    ## 🏆 Institutional Ranking Intelligence
-
-    Compare institutions using a composite performance score generated from
-    Academic, Research, Placement, Infrastructure, Faculty and Accreditation KPIs.
-    """)
 
     data = load_data()
     show_data_banner(data)
-
     kpi_df = data["kpis"]
 
     total_ranked = len(kpi_df)
@@ -35,19 +29,14 @@ def render():
     top100 = int((kpi_df["institution_rank"] <= 100).sum())
 
     c1, c2, c3 = st.columns(3)
-
     with c1:
-        st.metric("🏫 Total Ranked", total_ranked)
-
+        st.metric("Total Ranked", total_ranked)
     with c2:
-        st.metric("🥇 Top 50", top50)
-
+        st.metric("Top 50", top50)
     with c3:
-        st.metric("🏆 Top 100", top100)
+        st.metric("Top 100", top100)
 
-    st.markdown("---")
-
-    formula = " • ".join(
+    formula = " · ".join(
         f"{label} ({RANKING_WEIGHTS[key]:.0%})"
         for label, key in (
             ("Academic", "academic"),
@@ -58,15 +47,10 @@ def render():
             ("Accreditation", "accreditation"),
         )
     )
-    st.info(f"**Ranking Formula**\n\n{formula}")
+    section_panel("Ranking Formula", formula)
 
-    st.markdown("## 📈 Top Performing Institutions")
-
-    render_top_institutions_bar(
-        kpi_df,
-        n=min(10, len(kpi_df)),
-        page="ranking",
-    )
+    section_panel("Top Performing Institutions")
+    render_top_institutions_bar(kpi_df, n=min(10, len(kpi_df)), page="ranking")
 
     display_cols = filter_existing_columns(
         kpi_df,
@@ -84,76 +68,30 @@ def render():
         ],
     )
 
-    st.markdown("---")
-
-    tab1, tab2, tab3 = st.tabs(
-        [
-            "🥇 Top 10",
-            "🏆 Top 50",
-            "🔍 Ranking Explorer",
-        ]
-    )
-
+    tab1, tab2, tab3 = st.tabs(["Top 10", "Top 50", "Ranking Explorer"])
     with tab1:
-
-        st.markdown("### Top 10 Institutions")
-
+        st.markdown("**Leading institutions by composite rank score**")
         st.dataframe(
-            RankingEngine.get_top_n(
-                kpi_df,
-                10,
-            )[display_cols],
+            RankingEngine.get_top_n(kpi_df, 10)[display_cols],
             use_container_width=True,
             hide_index=True,
         )
-
     with tab2:
-
-        st.markdown("### Top 50 Institutions")
-
+        st.markdown("**Top 50 institutions**")
         st.dataframe(
-            RankingEngine.get_top_n(
-                kpi_df,
-                50,
-            )[display_cols],
+            RankingEngine.get_top_n(kpi_df, 50)[display_cols],
             use_container_width=True,
             hide_index=True,
         )
-
     with tab3:
-
-        st.markdown("### Search & Explore Rankings")
-
-        search = st.text_input(
-            "🔍 Search Institution",
-            "",
-            key=widget_key(
-                "ranking",
-                "search",
-            ),
-        )
-
+        search = st.text_input("Search Institution", "", key=widget_key("ranking", "search"))
         filtered = kpi_df
-
         if search:
-            filtered = kpi_df[
-                kpi_df["institution_name"].str.contains(
-                    search,
-                    case=False,
-                    na=False,
-                )
-            ]
-
+            filtered = kpi_df[kpi_df["institution_name"].str.contains(search, case=False, na=False)]
         st.dataframe(
-            filtered.sort_values(
-                "institution_rank"
-            )[display_cols],
+            filtered.sort_values("institution_rank")[display_cols],
             use_container_width=True,
             hide_index=True,
         )
 
-    st.markdown("---")
-
-    st.caption(
-        "Institutional Performance Analytics | Ranking Intelligence Engine"
-    )
+    st.caption("Institutional Performance Analytics | Ranking Intelligence Engine")

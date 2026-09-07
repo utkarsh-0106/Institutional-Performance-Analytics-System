@@ -6,6 +6,13 @@ import pandas as pd
 
 CHART_TEMPLATE = "plotly_white"
 COLOR_PALETTE = px.colors.qualitative.Set2
+CHART_LAYOUT = dict(
+    paper_bgcolor="#ffffff",
+    plot_bgcolor="#f8fafc",
+    font=dict(color="#122033", family="IBM Plex Sans, sans-serif"),
+    margin=dict(l=24, r=24, t=56, b=24),
+    colorway=["#1E4E8C", "#2F6FAD", "#5B8FC7", "#0B1F3A", "#C4A35A"],
+)
 
 
 def _has_statsmodels() -> bool:
@@ -30,7 +37,9 @@ def _scatter(df, x, y, title, hover_data=None, color_seq=None):
         kwargs["color_discrete_sequence"] = color_seq
     if _has_statsmodels() and len(df) >= 3:
         kwargs["trendline"] = "ols"
-    return px.scatter(**kwargs)
+    fig = px.scatter(**kwargs)
+    fig.update_layout(**CHART_LAYOUT)
+    return fig
 
 
 def kpi_comparison_chart(kpi_df: pd.DataFrame, institution_name: str = None) -> go.Figure:
@@ -56,6 +65,7 @@ def kpi_comparison_chart(kpi_df: pd.DataFrame, institution_name: str = None) -> 
         template=CHART_TEMPLATE,
         title="KPI Comparison (Radar)",
         polar=dict(radialaxis=dict(range=[0, 100])),
+        **CHART_LAYOUT,
     )
     return fig
 
@@ -75,7 +85,7 @@ def top_institutions_chart(kpi_df: pd.DataFrame, n: int = 15) -> go.Figure:
         color_continuous_scale="Blues",
         template=CHART_TEMPLATE,
     )
-    fig.update_layout(height=max(400, n * 28), yaxis={"categoryorder": "total ascending"})
+    fig.update_layout(height=max(400, n * 28), yaxis={"categoryorder": "total ascending"}, **CHART_LAYOUT)
     return fig
 
 
@@ -92,6 +102,7 @@ def ranking_distribution_chart(kpi_df: pd.DataFrame) -> go.Figure:
         color="ranking_category",
         template=CHART_TEMPLATE,
     )
+    fig.update_layout(**CHART_LAYOUT)
     return fig
 
 
@@ -149,6 +160,7 @@ def accreditation_analysis_chart(inst_df: pd.DataFrame, kpi_df: pd.DataFrame) ->
         color="avg_accreditation_score",
         template=CHART_TEMPLATE,
     )
+    fig.update_layout(**CHART_LAYOUT)
     return fig
 
 
@@ -159,7 +171,7 @@ def benchmark_gap_chart(gaps: dict) -> go.Figure:
     values = [float(v) for v in gaps.values()]
     colors = ["#2e7d32" if v >= 0 else "#c62828" for v in values]
     fig = go.Figure(go.Bar(x=labels, y=values, marker_color=colors))
-    fig.update_layout(template=CHART_TEMPLATE, title="Performance Gaps vs Benchmarks")
+    fig.update_layout(template=CHART_TEMPLATE, title="Performance Gaps vs Benchmarks", **CHART_LAYOUT)
     fig.add_hline(y=0, line_dash="dash", line_color="gray")
     return fig
 
@@ -174,4 +186,5 @@ def state_benchmark_chart(state_df: pd.DataFrame) -> go.Figure:
         title="State-wise Average Performance Index",
         template=CHART_TEMPLATE,
     )
+    fig.update_layout(**CHART_LAYOUT)
     return fig

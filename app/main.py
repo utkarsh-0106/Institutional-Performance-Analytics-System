@@ -8,9 +8,10 @@ if str(ROOT) not in sys.path:
 
 import streamlit as st
 
+from app.ui_common import inject_global_css
 from auth.login import render_login_page
 from auth.session import get_current_user, init_session_state, is_authenticated, logout_user
-from config.settings import APP_SUBTITLE, APP_TITLE
+from config.settings import APP_TITLE
 from services.pipeline_service import PipelineService
 
 # Page modules live in app/views/ (NOT app/pages/) to avoid Streamlit auto-multipage blank screens.
@@ -34,23 +35,27 @@ def _load_page(module_path: str):
 
 
 def render_sidebar() -> str:
-    st.sidebar.title("Institutional Analytics")
-    st.sidebar.caption(APP_SUBTITLE)
-    st.sidebar.markdown("---")
+    st.sidebar.markdown(
+        """
+        <div class="ipa-brand">
+            <h2>Institutional Analytics</h2>
+            <p>Higher Education Intelligence</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if not is_authenticated():
         st.sidebar.info("Please log in to access modules.")
         return "Home"
 
     user = get_current_user()
-    st.sidebar.success(f"Logged in: **{user.get('username', '')}**")
-    st.sidebar.write(f"Role: **{user.get('role', '')}**")
-    if user.get("id") is not None:
-        st.sidebar.caption(f"User ID: {user['id']}")
+    st.sidebar.caption(f"Signed in as {user.get('username', '')}")
+    st.sidebar.caption(f"Role · {user.get('role', '')}")
     if user.get("linked_institution"):
-        st.sidebar.write(f"Institution: {user['linked_institution']}")
+        st.sidebar.caption(user["linked_institution"])
 
-    st.sidebar.markdown("---")
+    st.sidebar.markdown("")
     page = st.sidebar.radio(
         "Navigate",
         list(PAGES.keys()),
@@ -92,6 +97,12 @@ def render_current_page(page: str) -> None:
 
 
 def main():
+    st.set_page_config(
+        page_title=APP_TITLE,
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+    inject_global_css()
     init_session_state()
 
     if not is_authenticated():

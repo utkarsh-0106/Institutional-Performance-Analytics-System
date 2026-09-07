@@ -17,6 +17,7 @@ from app.ui_common import (
     render_sample_pie_chart,
     render_top_institutions_bar,
     safe_plotly,
+    section_panel,
     show_data_banner,
     widget_key,
 )
@@ -27,14 +28,6 @@ def render():
         "Analytics Dashboard",
         "Institutional performance overview for UGC, AICTE, NAAC, and accreditation agencies",
     )
-
-    st.markdown("""
-    # 🎓 Institutional Performance Analytics
-
-    ### AI-Powered Higher Education Benchmarking Platform
-
-    Analyze • Benchmark • Rank • Predict
-    """)
 
     data = load_data()
     show_data_banner(data)
@@ -48,102 +41,51 @@ def render():
     avg_placement = round(inst_df["placement_percentage"].mean(), 2)
 
     c1, c2, c3, c4 = st.columns(4)
-
     with c1:
-        st.metric("🏫 Institutions", total_inst)
-
+        st.metric("Institutions", total_inst)
     with c2:
-        st.metric("🎓 Students", f"{total_students:,}")
-
+        st.metric("Students", f"{total_students:,}")
     with c3:
-        st.metric("👨‍🏫 Faculty", f"{total_faculty:,}")
-
+        st.metric("Faculty", f"{total_faculty:,}")
     with c4:
-        st.metric("📈 Avg Placement", f"{avg_placement}%")
+        st.metric("Avg Placement", f"{avg_placement}%")
 
-    st.markdown("## 📊 Key Performance Indicators")
+    section_panel("Key Performance Indicators")
     render_kpi_cards(inst_df, kpi_df)
 
-    st.divider()
-    st.markdown("## 📈 Charts & Analysis")
-
+    section_panel("Charts & Analysis", "Select an institution to inspect KPI structure against the national set.")
     institutions = sorted(inst_df["institution_name"].tolist())
-
     selected = st.selectbox(
-        "🔍 Select Institution for KPI Analysis",
+        "Select Institution for KPI Analysis",
         institutions,
         index=0,
         key=widget_key("dashboard", "radar_institution"),
     )
 
     c1, c2 = st.columns(2)
-
     with c1:
-        safe_plotly(
-            kpi_comparison_chart,
-            kpi_df,
-            selected,
-            page="dashboard",
-            chart_name="radar",
-        )
-
+        safe_plotly(kpi_comparison_chart, kpi_df, selected, page="dashboard", chart_name="radar")
     with c2:
-        safe_plotly(
-            top_institutions_chart,
-            kpi_df,
-            min(15, len(kpi_df)),
-            page="dashboard",
-            chart_name="top15",
-        )
+        safe_plotly(top_institutions_chart, kpi_df, min(15, len(kpi_df)), page="dashboard", chart_name="top15")
 
     c3, c4 = st.columns(2)
-
     with c3:
         if data.get("using_sample"):
             render_sample_pie_chart(kpi_df, page="dashboard")
         else:
-            safe_plotly(
-                ranking_distribution_chart,
-                kpi_df,
-                page="dashboard",
-                chart_name="rank_dist",
-            )
-
+            safe_plotly(ranking_distribution_chart, kpi_df, page="dashboard", chart_name="rank_dist")
     with c4:
-        safe_plotly(
-            placement_analysis_chart,
-            inst_df,
-            kpi_df,
-            page="dashboard",
-            chart_name="placement",
-        )
+        safe_plotly(placement_analysis_chart, inst_df, kpi_df, page="dashboard", chart_name="placement")
 
     c5, c6 = st.columns(2)
-
     with c5:
-        safe_plotly(
-            research_analysis_chart,
-            inst_df,
-            kpi_df,
-            page="dashboard",
-            chart_name="research",
-        )
-
+        safe_plotly(research_analysis_chart, inst_df, kpi_df, page="dashboard", chart_name="research")
     with c6:
-        safe_plotly(
-            accreditation_analysis_chart,
-            inst_df,
-            kpi_df,
-            page="dashboard",
-            chart_name="accreditation",
-        )
+        safe_plotly(accreditation_analysis_chart, inst_df, kpi_df, page="dashboard", chart_name="accreditation")
 
     if data.get("using_sample"):
         st.subheader("Additional Preview")
         render_top_institutions_bar(kpi_df, page="dashboard")
         render_sample_bar_chart(kpi_df)
 
-    st.markdown("---")
-    st.caption(
-        "Institutional Performance Analytics | SIH 2025 | AICTE & UGC Benchmarking Platform"
-    )
+    st.caption("Institutional Performance Analytics | SIH 2025 | AICTE & UGC Benchmarking Platform")

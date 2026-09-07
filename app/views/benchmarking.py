@@ -7,6 +7,7 @@ from app.ui_common import (
     page_header,
     render_sample_bar_chart,
     safe_plotly,
+    section_panel,
     show_data_banner,
     widget_key,
 )
@@ -34,7 +35,7 @@ def render():
     )
 
     if data.get("using_sample"):
-        st.subheader("Sample Benchmark Preview")
+        section_panel("Sample Benchmark Preview")
         sample_gaps = {
             "placement_vs_national": 5.2,
             "research_vs_national": -8.1,
@@ -51,32 +52,31 @@ def render():
         st.error("Could not generate comparison.")
         return
 
-    st.subheader(f"Analysis: {selected}")
+    section_panel(f"Analysis: {selected}")
     gaps = comparison.get("performance_gaps", {})
     if gaps:
         safe_plotly(benchmark_gap_chart, gaps, page="benchmarking", chart_name="gaps_live")
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown("#### National Benchmark")
+        st.markdown("**National Benchmark**")
         for k, v in list(comparison.get("national_benchmark", {}).items())[:6]:
-            st.write(f"**{k.replace('_', ' ').title()}:** {v}")
+            st.write(f"{k.replace('_', ' ').title()}: **{v}**")
     with col2:
-        st.markdown("#### State Benchmark")
+        st.markdown("**State Benchmark**")
         state = comparison.get("state_benchmark", {})
         if state:
             for k, v in list(state.items())[:6]:
-                st.write(f"**{k.replace('_', ' ').title()}:** {v}")
+                st.write(f"{k.replace('_', ' ').title()}: **{v}**")
         else:
             st.info("State data unavailable")
     with col3:
-        st.markdown("#### Top Performer Benchmark")
+        st.markdown("**Top Performer Benchmark**")
         for k, v in list(comparison.get("top_performer_benchmark", {}).items())[:6]:
-            st.write(f"**{k.replace('_', ' ').title()}:** {v}")
+            st.write(f"{k.replace('_', ' ').title()}: **{v}**")
 
-    st.divider()
     state_df = BenchmarkingService.compute_state_averages(inst_df, kpi_df)
     if not state_df.empty:
-        st.subheader("State-wise Benchmarks")
+        section_panel("State-wise Benchmarks")
         safe_plotly(state_benchmark_chart, state_df, page="benchmarking", chart_name="state")
         st.dataframe(state_df, use_container_width=True)

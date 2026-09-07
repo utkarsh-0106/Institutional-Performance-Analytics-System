@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from auth.session import is_admin
-from app.ui_common import load_data, page_header, render_kpi_cards, show_data_banner, widget_key
+from app.ui_common import asset_path, load_data, page_header, render_kpi_cards, section_panel, show_data_banner, widget_key
 from config.data_sources import AISHE_FILE, MERGED_DATASET_PATH, NAAC_FILE, NIRF_FILE, UGC_FILE
 from config.settings import SYNTHETIC_DATASET_PATH
 from services.etl.pipeline import ETLPipeline
@@ -48,7 +48,7 @@ def render():
 
     data = load_data()
     show_data_banner(data)
-    st.write(f"Current records in view: **{len(data['institutions'])}** institutions")
+    section_panel("Current Dataset", f"{len(data['institutions'])} institutions currently in view.")
     render_kpi_cards(data["institutions"], data["kpis"])
 
     if st.session_state.get("data_quality_report"):
@@ -160,6 +160,9 @@ def render():
 
     with tab4:
         st.subheader("Dataset Information")
+        lib = asset_path("research-library.jpg")
+        if Path(lib).exists():
+            st.image(lib, caption="Reference collections supporting institutional research reporting", use_container_width=True)
         if MERGED_DATASET_PATH.exists():
             df = pd.read_csv(MERGED_DATASET_PATH)
             st.success(f"**Primary (real merged):** `{MERGED_DATASET_PATH.name}` — {len(df)} rows")

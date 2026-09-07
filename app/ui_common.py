@@ -1,9 +1,34 @@
 """Shared UI helpers, sample data, and fallback content for all views."""
+import base64
+from pathlib import Path
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
 from services.pipeline_service import PipelineService
+
+ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+THEME_CSS_PATH = Path(__file__).resolve().parent / "theme.css"
+
+
+def asset_path(filename: str) -> str:
+    return str(ASSETS_DIR / filename)
+
+
+def image_data_uri(filename: str) -> str:
+    path = ASSETS_DIR / filename
+    if not path.exists():
+        return ""
+    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+    suffix = path.suffix.lower().replace(".", "") or "jpeg"
+    mime = "jpeg" if suffix in {"jpg", "jpeg"} else suffix
+    return f"data:image/{mime};base64,{encoded}"
+
+
+def inject_global_css() -> None:
+    css = THEME_CSS_PATH.read_text(encoding="utf-8") if THEME_CSS_PATH.exists() else ""
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 SAMPLE_INSTITUTIONS = pd.DataFrame({
     "id": [1, 2, 3, 4, 5],
@@ -72,10 +97,36 @@ def widget_key(page: str, name: str) -> str:
 
 
 def page_header(title: str, subtitle: str = "") -> None:
-    st.title(title)
-    if subtitle:
-        st.caption(subtitle)
-    st.markdown("---")
+    sub = f"<p>{subtitle}</p>" if subtitle else ""
+    st.markdown(
+        f'<div class="ipa-page-header"><h1>{title}</h1>{sub}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def section_panel(title: str, body: str = "") -> None:
+    extra = f"<p style='color:#5b6b7c;margin:0 0 0.6rem 0;'>{body}</p>" if body else ""
+    st.markdown(
+        f'<div class="ipa-panel"><h3>{title}</h3>{extra}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def render_hero(title: str, description: str, image_file: str, kicker: str = "Institutional Intelligence") -> None:
+    uri = image_data_uri(image_file)
+    bg = f"url('{uri}')" if uri else "linear-gradient(135deg, #0b1f3a, #1e4e8c)"
+    st.markdown(
+        f"""
+        <div class="ipa-hero" style="background-image: linear-gradient(90deg, rgba(7,20,40,0.88) 8%, rgba(11,31,58,0.52) 55%, rgba(11,31,58,0.2) 100%), {bg}; background-size: cover; background-position: center; min-height: 300px; display: flex; align-items: flex-end;">
+            <div class="ipa-hero-overlay" style="position: relative; background: none; width: 100%;">
+                <div class="ipa-kicker">{kicker}</div>
+                <h1>{title}</h1>
+                <p>{description}</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def load_data() -> dict:
@@ -159,7 +210,15 @@ def render_sample_bar_chart(kpi_df: pd.DataFrame, title: str = "KPI Scores (Samp
         labels={"x": "KPI", "y": "Score"},
         color=values, color_continuous_scale="Blues",
     )
-    fig.update_layout(showlegend=False, yaxis_range=[0, 100], template="plotly_white")
+    fig.update_layout(
+        showlegend=False,
+        yaxis_range=[0, 100],
+        template="plotly_white",
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#f8fafc",
+        font=dict(color="#122033", family="IBM Plex Sans, sans-serif"),
+        margin=dict(l=20, r=20, t=50, b=20),
+    )
     st.plotly_chart(fig, use_container_width=True, key=widget_key("chart", "sample_bar"))
 
 
@@ -180,6 +239,12 @@ def render_top_institutions_bar(kpi_df: pd.DataFrame, n: int = 5, page: str = "r
     fig = px.bar(
         top, x="composite_rank_score", y="institution_name", orientation="h",
         title=f"Top {n} Institutions", template="plotly_white",
+    )
+    fig.update_layout(
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#f8fafc",
+        font=dict(color="#122033", family="IBM Plex Sans, sans-serif"),
+        margin=dict(l=20, r=20, t=50, b=20),
     )
     st.plotly_chart(fig, use_container_width=True, key=widget_key(page, f"top_bar_{n}"))
 

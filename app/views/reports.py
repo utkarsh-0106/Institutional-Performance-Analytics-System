@@ -1,29 +1,20 @@
 """Report Generation - Module 9."""
 import streamlit as st
 
-from app.ui_common import load_data, page_header, show_data_banner, widget_key
+from app.ui_common import load_data, page_header, section_panel, show_data_banner, widget_key
 from auth.session import get_current_user
 from services.insights_service import InsightsService
 from services.report_service import ReportService
 
 def render():
     page_header(
-        "📄 Report Center",
-        "Generate comprehensive institutional intelligence reports"
+        "Report Center",
+        "Generate comprehensive institutional intelligence reports",
     )
-
-    st.markdown("""
-    ## 📑 Institutional Report Generator
-
-    Generate professional PDF reports containing:
-
-    ✅ Institution Profile  
-    ✅ KPI Analysis  
-    ✅ Ranking Performance  
-    ✅ ML Predictions  
-    ✅ Recommendations  
-    ✅ AI Insights
-    """)
+    section_panel(
+        "Institutional Report Generator",
+        "PDF reports include profile, KPIs, rankings, ML predictions, recommendations, and insights.",
+    )
 
     data = load_data()
     show_data_banner(data)

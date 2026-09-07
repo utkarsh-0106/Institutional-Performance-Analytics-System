@@ -1,7 +1,7 @@
 """AI Insights Module - Module 10."""
 import streamlit as st
 
-from app.ui_common import load_data, page_header, show_data_banner, widget_key
+from app.ui_common import load_data, page_header, section_panel, show_data_banner, widget_key
 from auth.session import get_current_user
 from services.insights_service import InsightsService
 
@@ -18,7 +18,7 @@ def render():
     tab1, tab2 = st.tabs(["System Insights", "Institution Insights"])
 
     with tab1:
-        st.subheader("System-wide Insights")
+        section_panel("System-wide Insights")
         if data.get("using_sample"):
             for text in [
                 "System preview: 5 sample institutions loaded.",
