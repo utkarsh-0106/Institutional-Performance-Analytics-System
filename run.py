@@ -7,29 +7,16 @@ ROOT = Path(__file__).resolve().parent
 
 
 def bootstrap():
-    """Build real datasets, run ETL, and initialize SQLite."""
+    """Build seed files if needed, then initialize via PipelineService."""
     sys.path.insert(0, str(ROOT))
     from config.data_sources import NIRF_FILE
-    from config.settings import MERGED_DATASET_PATH, SYNTHETIC_DATASET_PATH
+    from services.pipeline_service import PipelineService
 
     if not NIRF_FILE.exists():
         print("Building real Indian HE seed data (NIRF, AISHE, NAAC, UGC)...")
         from scripts.build_real_seed_data import main as build_real
         build_real()
 
-    if not MERGED_DATASET_PATH.exists():
-        print("Running ETL merge...")
-        from scripts.run_etl import main as run_etl
-        run_etl()
-        return
-
-    if not SYNTHETIC_DATASET_PATH.exists():
-        from scripts.generate_dataset import generate_dataset
-        df = generate_dataset(500)
-        df.to_csv(SYNTHETIC_DATASET_PATH, index=False)
-        print(f"Synthetic fallback saved: {SYNTHETIC_DATASET_PATH}")
-
-    from services.pipeline_service import PipelineService
     result = PipelineService().initialize_system()
     if result.get("success"):
         print(f"Pipeline ready: {result['institutions']} institutions ({result.get('data_source', 'unknown')})")

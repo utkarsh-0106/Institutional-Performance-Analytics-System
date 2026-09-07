@@ -9,6 +9,7 @@ from app.ui_common import (
     show_data_banner,
     widget_key,
 )
+from config.settings import RANKING_WEIGHTS
 from services.ranking_engine import RankingEngine
 
 def render():
@@ -46,12 +47,18 @@ def render():
 
     st.markdown("---")
 
-    st.info("""
-    **Ranking Formula**
-
-    Academic (25%) • Research (20%) • Placement (25%) •
-    Infrastructure (5%) • Faculty (15%) • Accreditation (10%)
-    """)
+    formula = " • ".join(
+        f"{label} ({RANKING_WEIGHTS[key]:.0%})"
+        for label, key in (
+            ("Academic", "academic"),
+            ("Research", "research"),
+            ("Placement", "placement"),
+            ("Infrastructure", "infrastructure"),
+            ("Faculty", "faculty"),
+            ("Accreditation", "accreditation"),
+        )
+    )
+    st.info(f"**Ranking Formula**\n\n{formula}")
 
     st.markdown("## 📈 Top Performing Institutions")
 

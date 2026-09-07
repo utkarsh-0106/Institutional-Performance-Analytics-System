@@ -54,13 +54,14 @@ COLUMN_ALIASES = {
     "NIRF Rank": "nirf_rank",
 }
 
+# Intended overall / ranking mix (KPIEngine + RankingEngine).
 RANKING_WEIGHTS = {
     "academic": 0.25,
-    "placement": 0.25,
     "research": 0.20,
-    "infrastructure": 0.15,
-    "faculty": 0.10,
-    "accreditation": 0.05,
+    "placement": 0.25,
+    "infrastructure": 0.05,
+    "faculty": 0.15,
+    "accreditation": 0.10,
 }
 
 ACCREDITATION_GRADE_MAP = {"A++": 100, "A+": 90, "A": 80, "B++": 70, "B+": 60, "B": 50, "C": 40, "NA": 30}

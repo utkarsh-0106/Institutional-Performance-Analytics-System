@@ -1,7 +1,7 @@
 """KPI calculation engine for institutional performance."""
 import pandas as pd
 
-from config.settings import ACCREDITATION_GRADE_MAP
+from config.settings import ACCREDITATION_GRADE_MAP, RANKING_WEIGHTS
 from utils.helpers import accreditation_to_score, nirf_to_score, normalize_score
 
 
@@ -43,25 +43,26 @@ class KPIEngine:
             lambda r: min(100.0, (r["faculty_count"] / max(r["student_enrollment"], 1)) * 500),
             axis=1,
         ).round(2)
-        work["faculty_score"] = work.apply(
-            lambda r: min(100.0, (r["faculty_count"] / max(r["student_enrollment"], 1)) * 500),
-            axis=1,
-        ).round(2)
 
         work["accreditation_score"] = work["accreditation_grade"].apply(
             lambda g: accreditation_to_score(g, ACCREDITATION_GRADE_MAP)
         ).round(2)
 
-        work["overall_performance_index"] = (
-            work["academic_score"] * 0.25
-            + work["research_score"] * 0.20
-            + work["placement_score"] * 0.25
-            + work["infrastructure_score_kpi"] * 0.05
-            + work["faculty_score"] * 0.15
-            + work["accreditation_score"] * 0.10
-        ).round(2)
+        work["overall_performance_index"] = KPIEngine.weighted_index(work)
 
         return work
+
+    @staticmethod
+    def weighted_index(work: pd.DataFrame) -> pd.Series:
+        w = RANKING_WEIGHTS
+        return (
+            work["academic_score"] * w["academic"]
+            + work["research_score"] * w["research"]
+            + work["placement_score"] * w["placement"]
+            + work["infrastructure_score_kpi"] * w["infrastructure"]
+            + work["faculty_score"] * w["faculty"]
+            + work["accreditation_score"] * w["accreditation"]
+        ).round(2)
 
     @staticmethod
     def to_db_records(kpi_df: pd.DataFrame) -> list:

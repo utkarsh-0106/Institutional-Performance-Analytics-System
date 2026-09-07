@@ -1,7 +1,7 @@
 """Custom institutional ranking engine."""
 import pandas as pd
 
-from config.settings import RANKING_WEIGHTS
+from services.kpi_engine import KPIEngine
 
 class RankingEngine:
     @staticmethod
@@ -10,14 +10,7 @@ class RankingEngine:
             return kpi_df
 
         work = kpi_df.copy()
-        work["composite_rank_score"] = (
-            work["academic_score"] * RANKING_WEIGHTS["academic"]
-            + work["placement_score"] * RANKING_WEIGHTS["placement"]
-            + work["research_score"] * RANKING_WEIGHTS["research"]
-            + work["infrastructure_score_kpi"] * RANKING_WEIGHTS["infrastructure"]
-            + work["faculty_score"] * RANKING_WEIGHTS["faculty"]
-            + work["accreditation_score"] * RANKING_WEIGHTS["accreditation"]
-        ).round(2)
+        work["composite_rank_score"] = KPIEngine.weighted_index(work)
 
         work = work.sort_values("composite_rank_score", ascending=False).reset_index(drop=True)
         work["institution_rank"] = range(1, len(work) + 1)

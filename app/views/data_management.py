@@ -107,6 +107,17 @@ def render():
             else:
                 st.error(result.get("errors", ["Pipeline failed"]))
 
+        st.caption("Ingest computes KPIs, rankings, and recommendations. ML training is a separate step.")
+        if st.button("Train ML Models", key=widget_key("data_mgmt", "train_ml_btn")):
+            with st.spinner("Training models from current institution and KPI data..."):
+                result = PipelineService().train_ml_models()
+            if result.get("success"):
+                st.success(f"Trained on {result['institutions']} institutions.")
+                if result.get("ml_metrics"):
+                    st.json(result["ml_metrics"])
+            else:
+                st.error(result.get("errors", ["Training failed"]))
+
     with tab4:
         st.subheader("Dataset Information")
         if MERGED_DATASET_PATH.exists():

@@ -102,11 +102,8 @@ class PipelineService:
         kpi_records = KPIEngine.to_db_records(kpi_df)
         kpi_records = RankingEngine.update_db_records(kpi_df, kpi_records)
 
-        try:
-            ml_metrics = self.ml_service.train_models(inst_df, kpi_df)
-        except Exception as exc:
-            ml_metrics = {"error": str(exc)}
-            self.ml_service.load_models()
+        models_loaded = self.ml_service.load_models()
+        ml_metrics = {"models_loaded": bool(models_loaded)}
 
         pred_df = self.ml_service.predict_all(inst_df)
         ml_records = self.ml_service.to_db_records(pred_df) if not pred_df.empty else []
@@ -131,6 +128,35 @@ class PipelineService:
             "ml_metrics": ml_metrics,
             "top_10": kpi_df.nsmallest(10, "institution_rank")["institution_name"].tolist(),
             "system_insights": system_insights,
+        }
+
+    def train_ml_models(self) -> dict:
+        """Explicit training only — not invoked by ingest or initialize_system."""
+        with get_db_session() as session:
+            inst_df = InstitutionRepository.to_dataframe(session)
+            kpi_df = KPIRepository.to_dataframe(session)
+
+        if inst_df.empty or kpi_df.empty:
+            return {"success": False, "errors": ["No institution/KPI data. Run ingest first."]}
+
+        try:
+            ml_metrics = self.ml_service.train_models(inst_df, kpi_df)
+        except Exception as exc:
+            return {"success": False, "errors": [str(exc)]}
+
+        pred_df = self.ml_service.predict_all(inst_df)
+        ml_records = self.ml_service.to_db_records(pred_df) if not pred_df.empty else []
+
+        with get_db_session() as session:
+            MLRepository.clear_all(session)
+            if ml_records:
+                MLRepository.bulk_save(session, ml_records)
+
+        return {
+            "success": True,
+            "institutions": len(inst_df),
+            "ml_predictions": len(ml_records),
+            "ml_metrics": ml_metrics,
         }
 
     def load_uploaded_file(self, file_path: Path, file_type: str = "csv") -> dict:

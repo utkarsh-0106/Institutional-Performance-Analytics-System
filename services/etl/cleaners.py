@@ -19,24 +19,19 @@ class ETLCleaners:
         if "_merge_key" not in work.columns:
             work["_merge_key"] = work["institution_name"].apply(normalize_institution_name)
 
-        numeric_cols = {
-            "student_enrollment": (500, 150000, 3000),
-            "faculty_count": (20, 8000, 150),
-            "placement_percentage": (30.0, 99.0, 65.0),
-            "research_publications": (5, 5000, 120),
-            "infrastructure_score": (25.0, 99.0, 60.0),
-            "nirf_rank": (1, 999, 500),
+        # Fill missing merge columns only. Range clipping belongs to DataCleaningService.
+        numeric_defaults = {
+            "student_enrollment": 3000,
+            "faculty_count": 150,
+            "placement_percentage": 65.0,
+            "research_publications": 120,
+            "infrastructure_score": 60.0,
+            "nirf_rank": 500,
         }
-        for col, (lo, hi, default) in numeric_cols.items():
+        for col, default in numeric_defaults.items():
             if col not in work.columns:
                 work[col] = default
             work[col] = pd.to_numeric(work[col], errors="coerce").fillna(default)
-            if col == "nirf_rank":
-                work[col] = work[col].clip(lo, hi).astype(int)
-            elif col in ("student_enrollment", "faculty_count", "research_publications"):
-                work[col] = work[col].clip(lo, hi).astype(int)
-            else:
-                work[col] = work[col].clip(lo, hi).astype(float)
 
         if "accreditation_grade" not in work.columns:
             work["accreditation_grade"] = "NA"
