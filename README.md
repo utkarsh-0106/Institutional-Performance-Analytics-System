@@ -9,6 +9,10 @@ https://institutional-performance-analytics-system-ujfv7cfx2uwpefuuzdb.streamlit
 
 ---
 
+## 🎬 Project Demo
+
+[▶️ Watch the 20-second project demo](https://portfolio-dqyw-opal.vercel.app/videos/institutional-performance-analytics.mp4)
+
 ## 📌 Project Overview
 
 Institutional Performance Analytics is a data-driven platform that helps educational institutions assess their performance using multiple Key Performance Indicators (KPIs).
