@@ -20,6 +20,7 @@ PAGES = {
     "Dashboard": "app.views.dashboard",
     "Data Management": "app.views.data_management",
     "KPI Overview": "app.views.kpi_overview",
+    "Institution Profile": "app.views.institution_profile",
     "Rankings": "app.views.ranking",
     "ML Predictions": "app.views.ml_predictions",
     "Recommendations": "app.views.recommendations",

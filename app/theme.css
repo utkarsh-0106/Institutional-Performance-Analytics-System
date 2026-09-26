@@ -1216,3 +1216,124 @@ div[data-testid="stFileUploader"] {
   .ipa-hero-overlay h1 { font-size: 1.5rem; }
   .ipa-note { flex-direction: column; gap: 0.55rem; }
 }
+
+/* ============================================================== comparison ==
+   Institution Profile: benchmark comparison grid and raw source-data rows.
+   Additive only — no existing selector is modified.
+   ======================================================================== */
+.ipa-bench-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.ipa-bench {
+  width: 100%;
+  min-width: 30rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.ipa-bench thead th {
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ipa-muted, #5b6b7c);
+  padding: 0 0.7rem 0.55rem;
+  border-bottom: 1px solid var(--ipa-grid, #e8edf3);
+  white-space: nowrap;
+}
+.ipa-bench tbody th,
+.ipa-bench tbody td {
+  padding: 0.7rem;
+  border-bottom: 1px solid var(--ipa-grid, #e8edf3);
+  vertical-align: top;
+}
+.ipa-bench tbody tr:last-child th,
+.ipa-bench tbody tr:last-child td { border-bottom: 0; }
+.ipa-bench tbody tr:hover { background: #f8fafc; }
+.ipa-bench-ind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  color: var(--ipa-ink, #0b1f3a);
+}
+.ipa-bench-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ipa-ink, #0b1f3a);
+}
+.ipa-bench td.ipa-bench-num { min-width: 8.5rem; }
+.ipa-bench-delta { margin-top: 0.3rem; }
+.ipa-bench tbody th { font-weight: 600; white-space: nowrap; }
+.ipa-bench { table-layout: fixed; }
+.ipa-bench th:first-child { width: 22%; }
+
+.ipa-pfields { display: grid; gap: 0.1rem; }
+.ipa-pfield {
+  display: grid;
+  grid-template-columns: minmax(9rem, 15rem) 1fr;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ipa-grid, #e8edf3);
+}
+.ipa-pfield:last-child { border-bottom: 0; }
+.ipa-pfield-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--ipa-muted, #5b6b7c);
+}
+.ipa-pfield-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ipa-ink, #0b1f3a);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .ipa-pfield { grid-template-columns: 1fr; gap: 0.15rem; }
+  .ipa-bench { min-width: 26rem; font-size: 0.84rem; }
+}
+
+/* Ranking contribution rows — additive, scoped to the profile module only. */
+.ipa-contrib { display: grid; gap: 0.15rem; }
+.ipa-contrib-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "name value" "meta value";
+  align-items: center;
+  gap: 0 0.8rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ipa-grid, #e8edf3);
+}
+.ipa-contrib-row:last-child { border-bottom: 0; }
+.ipa-contrib-name {
+  grid-area: name;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ipa-ink, #0b1f3a);
+}
+.ipa-contrib-w {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ipa-muted, #5b6b7c);
+  white-space: nowrap;
+}
+.ipa-contrib-meta {
+  grid-area: meta;
+  font-size: 0.74rem;
+  color: var(--ipa-muted, #5b6b7c);
+  font-variant-numeric: tabular-nums;
+}
+.ipa-contrib-val {
+  grid-area: value;
+  font-size: 1.02rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ipa-primary, #1e4e8c);
+  white-space: nowrap;
+}

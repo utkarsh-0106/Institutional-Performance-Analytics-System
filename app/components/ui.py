@@ -420,6 +420,87 @@ def quality_indicator(tone: str, label: str) -> str:
     return f'<span class="ipa-quality" data-tone="{_tone(tone, "neutral")}"><i></i>{esc(label)}</span>'
 
 
+def delta_badge(delta: Optional[float], label: str, tone: str, unit: str = " pts") -> str:
+    """A signed difference plus a plain-text position label.
+
+    The text is mandatory: colour is never the only carrier of meaning.
+    ``delta=None`` renders as an explicit "not available" state.
+    """
+    if delta is None:
+        return badge("Not available", "neutral")
+    try:
+        d = float(delta)
+    except (TypeError, ValueError):
+        return badge("Not available", "neutral")
+    sign = "+" if d > 0 else ("" if abs(d) < 1e-9 else "\u2212")
+    return badge(f"{sign}{abs(d):.2f}{esc(unit)} \u00b7 {esc(label)}", tone)
+
+
+def benchmark_table(
+    rows: Sequence[Mapping[str, Any]],
+    columns: Sequence[tuple[str, str]],
+    delta_labels: Optional[Mapping[str, Any]] = None,
+) -> str:
+    """A comparison grid where every cell is present, honest and self-describing.
+
+    ``columns`` is a sequence of (key, heading). For each column the row mapping
+    must supply ``f"{key}_display"``; when it also supplies ``f"{key}_delta"``
+    the delta is rendered. ``delta_labels`` maps a column key to a callable that
+    turns a delta into a ``(tone, text)`` pair, e.g.
+    ``services.institution_profile_service.benchmark_label``.
+
+    Columns with no source coverage render the caller's "not provided" text in
+    every cell rather than being hidden, so the reader can see what is missing.
+    """
+    parts = ['<div class="ipa-bench-wrap"><table class="ipa-bench">']
+    head = "".join(f'<th scope="col">{esc(heading)}</th>' for _, heading in columns)
+    parts.append(f"<thead><tr><th scope=\"col\">Indicator</th>{head}</tr></thead><tbody>")
+
+    for row in rows:
+        label = row.get("label", "")
+        icon_name = row.get("icon")
+        head_cell = (
+            f'<span class="ipa-bench-ind">{icon(icon_name, 15) if icon_name else ""}'
+            f'{esc(label)}</span>'
+        )
+        cells = [f'<th scope="row">{head_cell}</th>']
+        for key, _ in columns:
+            display = row.get(f"{key}_display")
+            if display is None:
+                display = "—"
+            cell = f'<td class="ipa-bench-num">{esc(str(display))}</td>'
+            label_fn = (delta_labels or {}).get(key)
+            if label_fn:
+                delta = row.get(f"{key}_delta")
+                tone, text = label_fn(delta)
+                cell += f'<div class="ipa-bench-delta">{delta_badge(delta, text, tone)}</div>'
+            cells.append(cell)
+        parts.append("<tr>" + "".join(cells) + "</tr>")
+
+    parts.append("</tbody></table></div>")
+    return "".join(parts)
+
+
+def profile_field(label: str, value: Any, icon_name: Optional[str] = None) -> str:
+    """A single labelled value row for the raw source-data listing."""
+    ic = icon(icon_name, 15) if icon_name else ""
+    shown = "Data unavailable" if value is None or value == "" else str(value)
+    return (
+        "<div class='ipa-pfield'>"
+        f"<span class='ipa-pfield-label'>{ic}{esc(label)}</span>"
+        f"<span class='ipa-pfield-value'>{esc(shown)}</span>"
+        "</div>"
+    )
+
+
+def profile_fields(rows: Sequence[tuple]) -> str:
+    """Render a list of (icon, label, value) triples as labelled rows."""
+    return "".join(
+        profile_field(label, value, icon_name)
+        for icon_name, label, value in rows
+    )
+
+
 # ----------------------------------------------------------------- states --
 def empty_state(
     title: str,

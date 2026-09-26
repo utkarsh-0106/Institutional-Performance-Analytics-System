@@ -1,0 +1,3 @@
+Introducing Institutional Performance Analytics: a higher-education intelligence platform combining KPI scoring, rankings, benchmarking, Random Forest predictions, recommendations, and automated insights in one Streamlit workspace.
+
+Built with Python, Streamlit, Pandas, Plotly, Scikit-learn, and SQLite.

@@ -1,4 +1,6 @@
 """Plotly chart builders for analytics dashboard."""
+from typing import Optional
+
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
@@ -66,6 +68,86 @@ def kpi_comparison_chart(kpi_df: pd.DataFrame, institution_name: str = None) -> 
         title="KPI Comparison (Radar)",
         polar=dict(radialaxis=dict(range=[0, 100])),
         **CHART_LAYOUT,
+    )
+    return fig
+
+
+def institution_radar_chart(
+    dimensions: list,
+    institution_values: list,
+    institution_name: str = "",
+    national_values: Optional[list] = None,
+    top10_values: Optional[list] = None,
+) -> go.Figure:
+    """Radar of the six existing KPI scores for one institution.
+
+    ``dimensions`` is a list of (key, label, icon) triples and the value lists
+    are positional and parallel to it. A ``None`` value means the source did
+    not provide that figure, so the trace is drawn with a gap rather than
+    being filled in — an absent benchmark is never estimated.
+
+    Unlike :func:`kpi_comparison_chart`, this builder never substitutes a
+    different institution when a lookup fails.
+    """
+    labels = [d[1] for d in dimensions]
+    if not labels:
+        return go.Figure()
+
+    def _close(values: list) -> list:
+        return list(values) + [values[0] if values else None]
+
+    def _close_labels() -> list:
+        return labels + [labels[0]]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(
+        r=_close(institution_values),
+        theta=_close_labels(),
+        name=institution_name or "Institution",
+        fill="toself",
+        fillcolor="rgba(30, 78, 140, 0.14)",
+        line=dict(color="#1E4E8C", width=2),
+        marker=dict(size=4),
+        hovertemplate="<b>%{theta}</b><br>%{r:.2f} / 100<extra>" + (institution_name or "Institution") + "</extra>",
+    ))
+    for values, name, color in (
+        (national_values, "National average", "#2AA7B8"),
+        (top10_values, "Top 10 performers", "#C4A35A"),
+    ):
+        if not values or all(v is None for v in values):
+            continue
+        fig.add_trace(go.Scatterpolar(
+            r=_close(values),
+            theta=_close_labels(),
+            name=name,
+            fill="none",
+            line=dict(color=color, width=1.6, dash="dot"),
+            hovertemplate="<b>%{theta}</b><br>%{r:.2f} / 100<extra>" + name + "</extra>",
+        ))
+
+    fig.update_layout(
+        template=CHART_TEMPLATE,
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff",
+        font=dict(color="#0f1b2d"),
+        margin=dict(l=40, r=40, t=20, b=20),
+        showlegend=True,
+        legend=dict(
+            orientation="h", yanchor="bottom", y=1.04, xanchor="left", x=0,
+            font=dict(size=12, color="#5b6b7c"),
+        ),
+        polar=dict(
+            bgcolor="#ffffff",
+            radialaxis=dict(
+                range=[0, 100], tickvals=[0, 25, 50, 75, 100],
+                gridcolor="#e2e8f0", linecolor="#cbd5e1",
+                tickfont=dict(size=11, color="#5b6b7c"),
+            ),
+            angularaxis=dict(
+                gridcolor="#eef2f7", linecolor="#cbd5e1",
+                tickfont=dict(size=12, color="#0b1f3a"),
+            ),
+        ),
     )
     return fig
 
