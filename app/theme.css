@@ -1,244 +1,1218 @@
-/* Institutional Performance Analytics — shared visual system */
+/* ============================================================================
+   Institutional Performance Analytics — "Institutional Intelligence" design system
+   Single source of truth for the visual language. No external font or asset
+   requests: everything resolves to local/system resources.
 
-@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+   Structure
+     01 Tokens
+     02 Base & typography
+     03 Layout
+     04 Sidebar
+     05 Page header, kickers, heroes
+     06 Cards & sections
+     07 Stat tiles, KPI tiles, progress
+     08 Badges, chips, monogram, callouts
+     09 Metrics, dataframes, charts
+     10 Tabs, expanders, inputs, buttons
+     11 Alerts, empty & error states
+     12 Utilities, motion, responsive
+   ========================================================================== */
 
+/* ---------------------------------------------------------- 01 Tokens --- */
 :root {
-  --ipa-navy: #0b1f3a;
-  --ipa-navy-mid: #143154;
-  --ipa-blue: #1e4e8c;
-  --ipa-accent: #2f6fad;
+  /* Ink / navy */
+  --ipa-ink-900: #060f1e;
+  --ipa-ink-800: #0b1f3a;
+  --ipa-ink-700: #143154;
+  --ipa-ink-600: #1e3a5f;
+
+  /* Brand */
+  --ipa-primary: #1e4e8c;
+  --ipa-primary-600: #2f6fad;
+  --ipa-primary-400: #5b8fc7;
+  --ipa-primary-200: #c3d6ea;
+  --ipa-primary-50: #eaf1f9;
+  --ipa-accent: #2aa7b8;
+  --ipa-accent-soft: #e2f3f5;
   --ipa-gold: #c4a35a;
+
+  /* Semantic */
+  --ipa-success: #0f8a5f;
+  --ipa-success-soft: #e6f5ee;
+  --ipa-warning: #b45309;
+  --ipa-warning-soft: #fdf3e3;
+  --ipa-critical: #b91c1c;
+  --ipa-critical-soft: #fdecec;
+
+  /* Neutrals */
+  --ipa-canvas: #f4f6fa;
   --ipa-surface: #ffffff;
-  --ipa-canvas: #f3f6fa;
-  --ipa-border: #d7e0ea;
-  --ipa-muted: #5b6b7c;
-  --ipa-text: #122033;
+  --ipa-surface-subtle: #fafbfd;
+  --ipa-surface-muted: #f1f5f9;
+  --ipa-border: #e2e8f0;
+  --ipa-border-strong: #cbd5e1;
+  --ipa-text: #0f1b2d;
+  --ipa-text-muted: #5b6b7c;
+  --ipa-text-subtle: #64748b;
+  --ipa-on-dark: #e8eef6;
+  --ipa-on-dark-muted: #9db0c6;
+
+  /* Radii */
+  --ipa-r-sm: 8px;
+  --ipa-r-md: 12px;
+  --ipa-r-lg: 16px;
+  --ipa-r-xl: 20px;
+  --ipa-r-pill: 999px;
+
+  /* Elevation (navy-tinted, never grey) */
+  --ipa-shadow-xs: 0 1px 2px rgba(11, 31, 58, 0.05);
+  --ipa-shadow-sm: 0 1px 2px rgba(11, 31, 58, 0.04), 0 4px 12px rgba(11, 31, 58, 0.05);
+  --ipa-shadow-md: 0 1px 2px rgba(11, 31, 58, 0.04), 0 10px 28px rgba(11, 31, 58, 0.07);
+  --ipa-shadow-focus: 0 0 0 3px rgba(30, 78, 140, 0.28);
+
+  /* Typography */
+  --ipa-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --ipa-font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Motion */
+  --ipa-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ipa-dur: 160ms;
+
+  /* Streamlit surface overrides */
+  --block-container-max-width: 1440px;
 }
 
+/* ------------------------------------------------- 02 Base & typography --- */
 html, body, [data-testid="stAppViewContainer"] {
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: var(--ipa-font);
   background: var(--ipa-canvas);
   color: var(--ipa-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 [data-testid="stHeader"] {
   background: transparent;
+  height: 2.75rem;
 }
 
-.block-container {
-  padding-top: 1.4rem;
-  padding-bottom: 3rem;
-  max-width: 1180px;
+[data-testid="stToolbar"] {
+  right: 0.75rem;
+  gap: 0.25rem;
 }
 
+[data-testid="stToolbar"] button,
+[data-testid="stToolbar"] [data-testid="stStatusWidget"] {
+  color: var(--ipa-text-subtle);
+}
+
+[data-testid="stAppDeployButton"] button {
+  background: var(--ipa-surface);
+  border: 1px solid var(--ipa-border);
+  border-radius: var(--ipa-r-sm);
+  color: var(--ipa-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+a, .stLink a {
+  color: var(--ipa-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+a:hover, .stLink a:hover { text-decoration: underline; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ipa-font);
+  color: var(--ipa-text);
+  letter-spacing: -0.02em;
+  line-height: 1.22;
+}
+
+hr, [data-testid="stDivider"] {
+  border-color: var(--ipa-border);
+}
+
+::selection { background: var(--ipa-primary-200); color: var(--ipa-ink-900); }
+
+*:focus-visible {
+  outline: 2px solid var(--ipa-primary-400);
+  outline-offset: 2px;
+  border-radius: var(--ipa-r-sm);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border: 3px solid var(--ipa-canvas);
+  border-radius: var(--ipa-r-pill);
+}
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ------------------------------------------------------------ 03 Layout --- */
+.block-container,
+[data-testid="stMainBlockContainer"] {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+  padding-left: 2.6rem;
+  padding-right: 2.6rem;
+  max-width: var(--block-container-max-width);
+}
+
+[data-testid="stVerticalBlock"] { gap: 0.35rem; }
+
+[data-testid="stHorizontalBlock"] { gap: 0.9rem; align-items: stretch; }
+
+[data-testid="stColumn"] {
+  min-width: 0;
+}
+
+[data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:first-child { margin-bottom: 0.1rem; }
+
+/* Page gutters get a touch tighter on smaller viewports (see 12 Responsive) */
+
+/* ----------------------------------------------------------- 04 Sidebar --- */
 section[data-testid="stSidebar"] {
-  background: linear-gradient(180deg, #071428 0%, #0f2c4d 72%, #143154 100%);
-  border-right: 1px solid #1a3a5c;
+  background: linear-gradient(180deg, #071428 0%, #0c2340 55%, #123054 100%);
+  border-right: 1px solid #1c3f66;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.03);
+  min-width: 268px;
+  max-width: 268px;
 }
 
-section[data-testid="stSidebar"] * {
-  color: #e8eef6 !important;
+section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+  padding: 1.1rem 0.95rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
-section[data-testid="stSidebar"] .stRadio label {
-  padding: 0.35rem 0.45rem;
-  border-radius: 8px;
+section[data-testid="stSidebar"] .stVerticalBlock { gap: 0.2rem; }
+
+section[data-testid="stSidebar"] *:not(.ipa-btn-ghost *) {
+  color: var(--ipa-on-dark);
 }
 
-section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-  color: #c5d2e0 !important;
-}
-
+/* Brand lockup -------------------------------------------------------- */
 .ipa-brand {
-  padding: 0.4rem 0.2rem 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
-  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.15rem 0.1rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 0.95rem;
+}
+
+.ipa-brand-mark {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 11px;
+  background: linear-gradient(145deg, #2f6fad, #143154 70%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
+}
+
+.ipa-brand-mark span {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
 }
 
 .ipa-brand h2 {
-  font-family: "Source Serif 4", serif;
-  font-size: 1.15rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
-  margin: 0 0 0.25rem 0;
-  color: #f8fafc !important;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: #f8fafc;
+  line-height: 1.25;
 }
 
 .ipa-brand p {
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
+  font-size: 0.63rem;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: #9db0c6 !important;
-  margin: 0;
+  color: var(--ipa-on-dark-muted);
+  margin: 0.18rem 0 0;
+  font-weight: 600;
 }
 
+/* Sidebar section labels --------------------------------------------- */
+.ipa-side-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #7f95ae;
+  margin: 0.9rem 0 0.4rem;
+  padding-left: 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.ipa-side-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.16), transparent);
+}
+
+/* Navigation --------------------------------------------------------- */
+[data-testid="stSidebar"] [role="radiogroup"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] > label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.44rem 0.6rem;
+  border-radius: var(--ipa-r-sm);
+  font-size: 0.855rem;
+  font-weight: 500;
+  color: #c6d4e4;
+  cursor: pointer;
+  transition: background var(--ipa-dur) var(--ipa-ease), color var(--ipa-dur) var(--ipa-ease);
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] > label:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] > label:has(input:checked) {
+  background: linear-gradient(90deg, rgba(47, 111, 173, 0.42), rgba(47, 111, 173, 0.14));
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(122, 176, 226, 0.24);
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] > label:has(input:checked)::before {
+  content: "";
+  position: absolute;
+  left: -0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  border-radius: 0 3px 3px 0;
+  background: var(--ipa-accent);
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] > label > div:first-child { flex: 1; min-width: 0; }
+
+[data-testid="stSidebar"] [role="radiogroup"] input { accent-color: var(--ipa-accent); }
+
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+  color: #c6d4e4 !important;
+}
+
+/* Sidebar footer ------------------------------------------------------ */
+.ipa-side-foot {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.68rem;
+  color: #8ba1b8;
+  letter-spacing: 0.02em;
+}
+
+[data-testid="stSidebar"] button {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #dbe6f2;
+  border-radius: var(--ipa-r-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background var(--ipa-dur) var(--ipa-ease);
+}
+[data-testid="stSidebar"] button:hover {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.26);
+  color: #ffffff;
+}
+
+/* ------------------------------------- 05 Page header, kickers, heroes --- */
 .ipa-page-header {
-  margin-bottom: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-bottom: 0.9rem;
+  margin-bottom: 1.15rem;
+  border-bottom: 1px solid var(--ipa-border);
 }
 
 .ipa-page-header h1 {
-  font-family: "Source Serif 4", serif;
-  font-size: 1.85rem;
+  font-size: 1.72rem;
   font-weight: 700;
-  color: var(--ipa-navy);
-  margin: 0 0 0.35rem 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.028em;
+  color: var(--ipa-ink-800);
+  margin: 0.1rem 0 0.3rem;
+  line-height: 1.15;
 }
 
 .ipa-page-header p {
-  color: var(--ipa-muted);
+  color: var(--ipa-text-muted);
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 62ch;
+}
+
+.ipa-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ipa-primary);
+  font-size: 0.665rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.ipa-kicker::before {
+  content: "";
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ipa-accent);
 }
 
 .ipa-hero {
   position: relative;
-  border-radius: 16px;
+  border-radius: var(--ipa-r-xl);
   overflow: hidden;
-  min-height: 280px;
-  margin-bottom: 1.5rem;
+  min-height: 300px;
   border: 1px solid var(--ipa-border);
-  box-shadow: 0 10px 28px rgba(11, 31, 58, 0.12);
-}
-
-.ipa-hero img {
-  width: 100%;
-  height: 320px;
-  object-fit: cover;
-  display: block;
-  filter: saturate(0.85) contrast(1.05);
+  box-shadow: var(--ipa-shadow-md);
 }
 
 .ipa-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(7,20,40,0.88) 8%, rgba(11,31,58,0.55) 55%, rgba(11,31,58,0.18) 100%);
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 2rem 2.1rem;
+  gap: 0.5rem;
+  padding: 2.1rem 2.2rem;
+  width: 100%;
+  min-height: inherit;
 }
 
 .ipa-hero-overlay h1 {
-  font-family: "Source Serif 4", serif;
-  color: #fff;
-  font-size: 2rem;
-  margin: 0 0 0.45rem 0;
-  line-height: 1.2;
+  font-size: clamp(1.6rem, 3.1vw, 2.45rem);
+  font-weight: 700;
+  letter-spacing: -0.032em;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.1;
+  text-wrap: balance;
 }
 
 .ipa-hero-overlay p {
-  color: #d7e3f0;
+  color: #dbe6f5;
   margin: 0;
-  max-width: 36rem;
-  font-size: 0.98rem;
+  max-width: 44ch;
+  font-size: 0.96rem;
+  line-height: 1.55;
 }
 
-.ipa-kicker {
-  color: #c4a35a;
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 0.45rem;
+/* Kicker sits on imagery → light-on-dark variant */
+.ipa-hero .ipa-kicker,
+.ipa-hero-overlay .ipa-kicker {
+  color: #7fd3e0;
+}
+.ipa-hero .ipa-kicker::before { background: var(--ipa-accent); }
+
+.ipa-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
 }
 
-.ipa-panel {
+/* --------------------------------------------- 06 Cards & sections ------ */
+/* A `card()` renders a zero-height marker inside a st.container(); these two
+   rules turn that container into the card surface and hide the marker. */
+div[data-testid="stLayoutWrapper"] > div[data-testid="stVerticalBlock"]:has(> div[data-testid="stElementContainer"] .ipa-card-mark) {
   background: var(--ipa-surface);
   border: 1px solid var(--ipa-border);
-  border-radius: 14px;
-  padding: 1.1rem 1.2rem 0.4rem;
+  border-radius: var(--ipa-r-lg);
+  padding: 1.15rem 1.25rem 1.25rem;
   margin-bottom: 1.1rem;
-  box-shadow: 0 4px 16px rgba(11, 31, 58, 0.05);
+  box-shadow: var(--ipa-shadow-sm);
 }
 
+div[data-testid="stLayoutWrapper"] > div[data-testid="stVerticalBlock"]:has(> div[data-testid="stElementContainer"] .ipa-card-mark)
+  > div[data-testid="stElementContainer"]:has(.ipa-card-mark) {
+  display: none;
+}
+
+/* Variants, selected by the marker's data-card attribute */
+div[data-testid="stLayoutWrapper"] > div[data-testid="stVerticalBlock"]:has(> div[data-testid="stElementContainer"] .ipa-card-mark[data-card="flush"]) {
+  padding: 0.5rem 0.5rem 0.75rem;
+  box-shadow: none;
+  background: transparent;
+  border-color: transparent;
+}
+div[data-testid="stLayoutWrapper"] > div[data-testid="stVerticalBlock"]:has(> div[data-testid="stElementContainer"] .ipa-card-mark[data-card="quiet"]) {
+  background: var(--ipa-surface-subtle);
+  box-shadow: none;
+}
+div[data-testid="stLayoutWrapper"] > div[data-testid="stVerticalBlock"]:has(> div[data-testid="stElementContainer"] .ipa-card-mark[data-card="dark"]) {
+  background: linear-gradient(160deg, var(--ipa-ink-800), var(--ipa-ink-700));
+  border-color: #1c3f66;
+  color: var(--ipa-on-dark);
+}
+
+/* Section header (also the successor of the old .ipa-panel) -------------- */
+.ipa-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.9rem;
+  margin: 0 0 0.85rem;
+}
+
+.ipa-section-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.02rem;
+  font-weight: 650;
+  letter-spacing: -0.014em;
+  color: var(--ipa-ink-800);
+  margin: 0;
+}
+
+.ipa-section-head h3 svg { color: var(--ipa-primary-600); flex: 0 0 auto; }
+
+.ipa-section-head p {
+  margin: 0.3rem 0 0;
+  font-size: 0.845rem;
+  line-height: 1.5;
+  color: var(--ipa-text-muted);
+  max-width: 78ch;
+}
+
+.ipa-section-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: var(--ipa-r-sm);
+  background: var(--ipa-primary-50);
+  border: 1px solid var(--ipa-primary-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ipa-primary);
+}
+
+/* Legacy panel kept for the not-yet-migrated views, now a clean header --- */
+.ipa-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 1.35rem 0 0.7rem;
+  box-shadow: none;
+}
 .ipa-panel h3 {
-  font-size: 1.05rem;
-  color: var(--ipa-navy);
-  margin: 0 0 0.2rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.02rem;
+  font-weight: 650;
+  letter-spacing: -0.014em;
+  color: var(--ipa-ink-800);
+  margin: 0 0 0.25rem;
+}
+.ipa-panel h3::before {
+  content: "";
+  width: 3px;
+  height: 15px;
+  border-radius: 2px;
+  background: var(--ipa-primary-600);
+}
+.ipa-panel p {
+  color: var(--ipa-text-muted) !important;
+  font-size: 0.845rem;
+  margin: 0 0 0.2rem !important;
+  line-height: 1.5;
 }
 
 .ipa-chip-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
-  margin: 0.85rem 0 0.2rem;
+  gap: 0.4rem;
+  margin: 0.9rem 0 0.2rem;
 }
-
 .ipa-chip {
-  background: #eaf0f7;
-  color: var(--ipa-navy);
-  border: 1px solid #c9d6e5;
-  border-radius: 999px;
-  padding: 0.28rem 0.7rem;
-  font-size: 0.78rem;
+  background: var(--ipa-surface);
+  color: var(--ipa-ink-700);
+  border: 1px solid var(--ipa-border);
+  border-radius: var(--ipa-r-pill);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.765rem;
   font-weight: 600;
+  letter-spacing: 0.005em;
+  box-shadow: var(--ipa-shadow-xs);
 }
 
+/* ------------------------------------------ 07 Stat tiles, KPI, meters --- */
+.ipa-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  gap: 0.8rem;
+  margin: 0.15rem 0 0.35rem;
+}
+
+.ipa-stat {
+  position: relative;
+  background: var(--ipa-surface);
+  border: 1px solid var(--ipa-border);
+  border-radius: var(--ipa-r-md);
+  padding: 0.85rem 0.95rem 0.9rem;
+  box-shadow: var(--ipa-shadow-xs);
+  overflow: hidden;
+  transition: box-shadow var(--ipa-dur) var(--ipa-ease), transform var(--ipa-dur) var(--ipa-ease),
+    border-color var(--ipa-dur) var(--ipa-ease);
+}
+.ipa-stat:hover {
+  box-shadow: var(--ipa-shadow-sm);
+  border-color: var(--ipa-border-strong);
+  transform: translateY(-1px);
+}
+.ipa-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--ipa-primary-400);
+}
+.ipa-stat[data-tone="primary"]::before { background: var(--ipa-primary); }
+.ipa-stat[data-tone="accent"]::before { background: var(--ipa-accent); }
+.ipa-stat[data-tone="success"]::before { background: var(--ipa-success); }
+.ipa-stat[data-tone="warning"]::before { background: var(--ipa-warning); }
+.ipa-stat[data-tone="critical"]::before { background: var(--ipa-critical); }
+.ipa-stat[data-tone="neutral"]::before { background: var(--ipa-border-strong); }
+
+.ipa-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.665rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ipa-text-subtle);
+  margin-bottom: 0.4rem;
+}
+.ipa-stat-label svg { color: var(--ipa-primary-400); }
+
+.ipa-stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  color: var(--ipa-ink-800);
+  line-height: 1.08;
+  font-variant-numeric: tabular-nums;
+}
+.ipa-stat-value small {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ipa-text-muted);
+  margin-left: 0.15rem;
+  letter-spacing: 0;
+}
+.ipa-stat-hint {
+  margin-top: 0.3rem;
+  font-size: 0.755rem;
+  line-height: 1.4;
+  color: var(--ipa-text-muted);
+}
+.ipa-stat-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  margin-top: 0.4rem;
+  font-size: 0.735rem;
+  font-weight: 650;
+}
+.ipa-stat-delta[data-tone="success"] { color: var(--ipa-success); }
+.ipa-stat-delta[data-tone="critical"] { color: var(--ipa-critical); }
+.ipa-stat-delta[data-tone="warning"] { color: var(--ipa-warning); }
+.ipa-stat-delta[data-tone="neutral"] { color: var(--ipa-text-subtle); }
+
+/* KPI tile: value + labelled progress meter ---------------------------- */
+.ipa-kpi {
+  background: var(--ipa-surface);
+  border: 1px solid var(--ipa-border);
+  border-radius: var(--ipa-r-md);
+  padding: 0.95rem 1rem 1rem;
+  box-shadow: var(--ipa-shadow-xs);
+  transition: box-shadow var(--ipa-dur) var(--ipa-ease), transform var(--ipa-dur) var(--ipa-ease);
+}
+.ipa-kpi:hover { box-shadow: var(--ipa-shadow-sm); transform: translateY(-1px); }
+
+.ipa-kpi-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.665rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ipa-text-subtle);
+}
+.ipa-kpi-head svg { color: var(--ipa-primary-400); }
+
+.ipa-kpi-value {
+  margin-top: 0.5rem;
+  font-size: 1.72rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ipa-ink-800);
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.ipa-kpi-value small { font-size: 0.8rem; font-weight: 600; color: var(--ipa-text-muted); }
+
+.ipa-meter {
+  position: relative;
+  height: 6px;
+  border-radius: var(--ipa-r-pill);
+  background: var(--ipa-surface-muted);
+  overflow: hidden;
+  margin-top: 0.7rem;
+}
+.ipa-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--ipa-r-pill);
+  background: linear-gradient(90deg, var(--ipa-primary), var(--ipa-primary-600));
+  animation: ipa-meter-in 620ms var(--ipa-ease) both;
+}
+.ipa-meter[data-tone="success"] > span { background: linear-gradient(90deg, #10a37f, var(--ipa-success)); }
+.ipa-meter[data-tone="warning"] > span { background: linear-gradient(90deg, #d97706, var(--ipa-warning)); }
+.ipa-meter[data-tone="critical"] > span { background: linear-gradient(90deg, #dc2626, var(--ipa-critical)); }
+.ipa-meter[data-tone="accent"] > span { background: linear-gradient(90deg, #38bdf8, var(--ipa-accent)); }
+
+@keyframes ipa-meter-in {
+  from { width: 0 !important; }
+}
+
+/* Weight / contribution bar (ranking methodology) ---------------------- */
+.ipa-weights { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 0.2rem; }
+.ipa-weight { display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 0.75rem; align-items: center; }
+.ipa-weight-name { font-size: 0.82rem; font-weight: 600; color: var(--ipa-ink-700); }
+.ipa-weight-val {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ipa-primary);
+  font-variant-numeric: tabular-nums;
+}
+.ipa-weight .ipa-meter { grid-column: 1 / -1; height: 5px; margin-top: 0.1rem; }
+
+/* ------------------------------------ 08 Badges, chips, monogram, cards -- */
+.ipa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--ipa-r-pill);
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.ipa-badge[data-tone="primary"] { background: var(--ipa-primary-50); color: var(--ipa-primary); border-color: var(--ipa-primary-200); }
+.ipa-badge[data-tone="accent"] { background: var(--ipa-accent-soft); color: #14666f; border-color: #b9e0e5; }
+.ipa-badge[data-tone="success"] { background: var(--ipa-success-soft); color: var(--ipa-success); border-color: #bfe5d4; }
+.ipa-badge[data-tone="warning"] { background: var(--ipa-warning-soft); color: var(--ipa-warning); border-color: #f2ddb8; }
+.ipa-badge[data-tone="critical"] { background: var(--ipa-critical-soft); color: var(--ipa-critical); border-color: #f3c9c9; }
+.ipa-badge[data-tone="neutral"] { background: var(--ipa-surface-muted); color: var(--ipa-text-muted); border-color: var(--ipa-border); }
+
+/* Priority / insight cards -------------------------------------------- */
+.ipa-note {
+  display: flex;
+  gap: 0.8rem;
+  background: var(--ipa-surface);
+  border: 1px solid var(--ipa-border);
+  border-left: 3px solid var(--ipa-primary-400);
+  border-radius: var(--ipa-r-md);
+  padding: 0.85rem 0.95rem;
+  box-shadow: var(--ipa-shadow-xs);
+  transition: box-shadow var(--ipa-dur) var(--ipa-ease), transform var(--ipa-dur) var(--ipa-ease);
+}
+.ipa-note + .ipa-note { margin-top: 0.6rem; }
+.ipa-note:hover { box-shadow: var(--ipa-shadow-sm); transform: translateY(-1px); }
+.ipa-note[data-tone="high"] { border-left-color: var(--ipa-critical); }
+.ipa-note[data-tone="medium"] { border-left-color: var(--ipa-warning); }
+.ipa-note[data-tone="low"] { border-left-color: var(--ipa-success); }
+.ipa-note[data-tone="info"] { border-left-color: var(--ipa-primary); }
+.ipa-note[data-tone="accent"] { border-left-color: var(--ipa-accent); }
+
+.ipa-note-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: var(--ipa-r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ipa-surface-muted);
+  color: var(--ipa-text-muted);
+}
+.ipa-note[data-tone="high"] .ipa-note-icon { background: var(--ipa-critical-soft); color: var(--ipa-critical); }
+.ipa-note[data-tone="medium"] .ipa-note-icon { background: var(--ipa-warning-soft); color: var(--ipa-warning); }
+.ipa-note[data-tone="low"] .ipa-note-icon { background: var(--ipa-success-soft); color: var(--ipa-success); }
+.ipa-note[data-tone="info"] .ipa-note-icon { background: var(--ipa-primary-50); color: var(--ipa-primary); }
+.ipa-note[data-tone="accent"] .ipa-note-icon { background: var(--ipa-accent-soft); color: #14666f; }
+
+.ipa-note-body { min-width: 0; flex: 1; }
+.ipa-note-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  font-weight: 650;
+  color: var(--ipa-ink-800);
+  margin-bottom: 0.22rem;
+}
+.ipa-note-text { font-size: 0.845rem; line-height: 1.55; color: var(--ipa-text-muted); margin: 0; }
+.ipa-note-meta { margin-top: 0.45rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+/* Data-driven institution monogram (no fabricated photography) ---------- */
+.ipa-monogram {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, var(--ipa-surface), var(--ipa-surface-subtle));
+  border: 1px solid var(--ipa-border);
+  border-radius: var(--ipa-r-md);
+  box-shadow: var(--ipa-shadow-xs);
+}
+.ipa-monogram-mark {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 14px;
+  background: linear-gradient(150deg, #2f6fad, #143154);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 18px rgba(11, 31, 58, 0.22);
+}
+.ipa-monogram-body { min-width: 0; }
+.ipa-monogram-name {
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: var(--ipa-ink-800);
+  line-height: 1.3;
+  margin: 0 0 0.2rem;
+}
+.ipa-monogram-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+/* Inline definition rows (formula transparency) ------------------------ */
+.ipa-defs { display: flex; flex-direction: column; gap: 0.1rem; }
+.ipa-def {
+  display: grid;
+  grid-template-columns: minmax(140px, 190px) 1fr;
+  gap: 0.2rem 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--ipa-border);
+}
+.ipa-def:last-child { border-bottom: 0; }
+.ipa-def dt { font-size: 0.83rem; font-weight: 650; color: var(--ipa-ink-700); margin: 0; }
+.ipa-def dd { margin: 0; font-size: 0.82rem; line-height: 1.5; color: var(--ipa-text-muted); }
+.ipa-def code,
+.ipa-formula {
+  font-family: var(--ipa-font-mono);
+  font-size: 0.775rem;
+  background: var(--ipa-surface-muted);
+  border: 1px solid var(--ipa-border);
+  border-radius: 6px;
+  padding: 0.08rem 0.34rem;
+  color: var(--ipa-ink-700);
+}
+.ipa-source {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-family: var(--ipa-font-mono);
+  font-size: 0.7rem;
+  color: var(--ipa-text-subtle);
+}
+
+/* --------------------------------- 09 Metrics, dataframes, plotly ------- */
 div[data-testid="stMetric"] {
   background: var(--ipa-surface);
   border: 1px solid var(--ipa-border);
-  border-radius: 14px;
-  padding: 0.85rem 0.95rem 0.7rem;
-  box-shadow: 0 4px 14px rgba(11, 31, 58, 0.05);
+  border-radius: var(--ipa-r-md);
+  padding: 0.8rem 0.9rem 0.85rem;
+  box-shadow: var(--ipa-shadow-xs);
+  transition: box-shadow var(--ipa-dur) var(--ipa-ease), transform var(--ipa-dur) var(--ipa-ease);
 }
+div[data-testid="stMetric"]:hover { box-shadow: var(--ipa-shadow-sm); transform: translateY(-1px); }
 
-div[data-testid="stMetric"] label {
-  color: var(--ipa-muted) !important;
-  font-size: 0.78rem !important;
-  letter-spacing: 0.03em;
+div[data-testid="stMetric"] [data-testid="stMetricLabel"] {
+  color: var(--ipa-text-subtle) !important;
+  font-size: 0.665rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  font-weight: 600 !important;
 }
 
-div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-  color: var(--ipa-navy) !important;
+div[data-testid="stMetric"] [data-testid="stMetricValue"],
+div[data-testid="stMetric"] [data-testid="stMetricValue"] span {
+  color: var(--ipa-ink-800) !important;
   font-weight: 700;
   font-size: 1.55rem;
+  letter-spacing: -0.028em;
+  font-variant-numeric: tabular-nums;
 }
 
 .stDataFrame, [data-testid="stDataFrame"] {
   border: 1px solid var(--ipa-border);
-  border-radius: 12px;
+  border-radius: var(--ipa-r-md);
   overflow: hidden;
+  box-shadow: var(--ipa-shadow-xs);
+}
+[data-testid="stDataFrame"] [role="columnheader"] {
+  background: var(--ipa-surface-subtle);
+  font-size: 0.76rem;
+  font-weight: 650;
+  color: var(--ipa-text-muted);
+  letter-spacing: 0.02em;
+}
+[data-testid="stDataFrame"] [role="gridcell"] { font-size: 0.82rem; color: var(--ipa-ink-700); }
+
+.js-plotly-plot {
+  border-radius: var(--ipa-r-md);
+  overflow: hidden;
+  font-family: var(--ipa-font) !important;
+}
+.js-plotly-plot .main-svg { background: transparent !important; }
+/* Global chart typography — keeps Plotly consistent with the sans system
+   stack without touching chart construction code. */
+.js-plotly-plot text,
+.js-plotly-plot .gtitle,
+.js-plotly-plot .xtick text,
+.js-plotly-plot .ytick text,
+.js-plotly-plot .legendtext {
+  font-family: var(--ipa-font) !important;
+}
+.js-plotly-plot .gtitle { font-weight: 650 !important; letter-spacing: -0.01em; }
+.js-plotly-plot .modebar { background: transparent !important; }
+.js-plotly-plot .modebar-btn path { fill: var(--ipa-text-subtle) !important; }
+.js-plotly-plot:hover .modebar-btn path { fill: var(--ipa-primary) !important; }
+
+.ipa-chart-note {
+  margin: 0.55rem 0 0;
+  font-size: 0.755rem;
+  line-height: 1.45;
+  color: var(--ipa-text-subtle);
 }
 
+/* --------------------------------- 10 Tabs, expanders, inputs, buttons -- */
 .stTabs [data-baseweb="tab-list"] {
-  gap: 0.35rem;
+  gap: 0.3rem;
   background: transparent;
+  border-bottom: 1px solid var(--ipa-border);
+  padding-bottom: 0;
 }
 
 .stTabs [data-baseweb="tab"] {
-  border-radius: 8px 8px 0 0;
-  padding: 0.55rem 0.9rem;
+  border-radius: var(--ipa-r-sm) var(--ipa-r-sm) 0 0;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.86rem;
   font-weight: 600;
+  color: var(--ipa-text-muted);
 }
+.stTabs [aria-selected="true"] { color: var(--ipa-primary) !important; }
+.stTabs [data-baseweb="tab-highlight"] { background: var(--ipa-primary); height: 2px; }
 
-div.stButton > button[kind="primary"] {
-  background: linear-gradient(180deg, #1e4e8c, #163c6e);
-  border: 1px solid #123258;
-  color: #fff;
-  border-radius: 10px;
-  font-weight: 600;
-}
-
-div.stButton > button {
-  border-radius: 10px;
-}
-
-.ipa-login-wrap {
-  max-width: 980px;
-  margin: 1.5rem auto 0;
-}
-
-.ipa-rec-high, .ipa-rec-med, .ipa-rec-low {
-  border-radius: 12px;
-  padding: 0.75rem 0.9rem;
-  margin-bottom: 0.55rem;
+[data-testid="stExpander"] {
   border: 1px solid var(--ipa-border);
+  border-radius: var(--ipa-r-md);
+  background: var(--ipa-surface);
+  box-shadow: var(--ipa-shadow-xs);
+  overflow: hidden;
+}
+[data-testid="stExpander"] summary {
+  font-size: 0.875rem;
+  font-weight: 650;
+  color: var(--ipa-ink-700);
+}
+[data-testid="stExpander"] summary:hover { background: var(--ipa-surface-subtle); }
+
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] label {
+  font-size: 0.775rem !important;
+  font-weight: 650 !important;
+  color: var(--ipa-text-muted) !important;
+  letter-spacing: 0.02em;
 }
 
-.js-plotly-plot {
-  border-radius: 12px;
+input[data-testid="stTextInputField"],
+[data-testid="stSelectbox"] div[role="combobox"],
+[data-testid="stNumberInput"] input {
+  background: var(--ipa-surface) !important;
+  border: 1px solid var(--ipa-border) !important;
+  border-radius: var(--ipa-r-sm) !important;
+  font-size: 0.865rem !important;
+  color: var(--ipa-text) !important;
+  min-height: 2.35rem;
+}
+input[data-testid="stTextInputField"]:focus,
+[data-testid="stSelectbox"] div[role="combobox"]:focus {
+  border-color: var(--ipa-primary-400) !important;
+  box-shadow: var(--ipa-shadow-focus);
+}
+
+[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p {
+  color: var(--ipa-text-subtle) !important;
+  font-size: 0.775rem !important;
+  line-height: 1.5;
+}
+
+[data-testid="stSlider"] [role="slider"] { accent-color: var(--ipa-primary); }
+
+div.stButton > button,
+div[data-testid="stDownloadButton"] > button,
+div[data-testid="stFileUploader"] button {
+  border-radius: var(--ipa-r-sm);
+  border: 1px solid var(--ipa-border);
+  background: var(--ipa-surface);
+  color: var(--ipa-ink-700);
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: var(--ipa-shadow-xs);
+  transition: background var(--ipa-dur) var(--ipa-ease), border-color var(--ipa-dur) var(--ipa-ease),
+    box-shadow var(--ipa-dur) var(--ipa-ease), transform var(--ipa-dur) var(--ipa-ease);
+  min-height: 2.35rem;
+}
+div.stButton > button:hover,
+div[data-testid="stDownloadButton"] > button:hover {
+  background: var(--ipa-surface-subtle);
+  border-color: var(--ipa-border-strong);
+  box-shadow: var(--ipa-shadow-sm);
+}
+div.stButton > button:active { transform: translateY(1px); }
+
+div.stButton > button[kind="primary"],
+button[data-testid="stBaseButton-primary"] {
+  background: linear-gradient(180deg, var(--ipa-primary-600), var(--ipa-primary));
+  border: 1px solid #1a4276;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(11, 31, 58, 0.18), 0 6px 16px rgba(30, 78, 140, 0.24);
+}
+div.stButton > button[kind="primary"]:hover,
+button[data-testid="stBaseButton-primary"]:hover {
+  background: linear-gradient(180deg, #3a7cbb, #1e4e8c);
+  border-color: #1a4276;
+  box-shadow: 0 2px 4px rgba(11, 31, 58, 0.2), 0 10px 22px rgba(30, 78, 140, 0.3);
+}
+div.stButton > button:disabled { opacity: 0.55; box-shadow: none; }
+
+div[data-testid="stFileUploader"] {
+  border: 1px dashed var(--ipa-border-strong);
+  border-radius: var(--ipa-r-md);
+  background: var(--ipa-surface-subtle);
+  padding: 0.5rem;
+}
+
+/* ------------------------------------ 11 Alerts, empty & error states ---- */
+[data-testid="stAlert"] {
+  border-radius: var(--ipa-r-md);
+  border: 1px solid var(--ipa-border);
+  font-size: 0.85rem;
+}
+
+.ipa-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 2.4rem 1.5rem;
+  background: var(--ipa-surface-subtle);
+  border: 1px dashed var(--ipa-border-strong);
+  border-radius: var(--ipa-r-lg);
+}
+.ipa-empty-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--ipa-surface);
+  border: 1px solid var(--ipa-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ipa-primary-400);
+  box-shadow: var(--ipa-shadow-xs);
+}
+.ipa-empty h4 {
+  margin: 0.25rem 0 0;
+  font-size: 0.98rem;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  color: var(--ipa-ink-800);
+}
+.ipa-empty p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--ipa-text-muted);
+  max-width: 46ch;
+}
+
+.ipa-fault {
+  border: 1px solid #f3c9c9;
+  border-left: 3px solid var(--ipa-critical);
+  background: var(--ipa-critical-soft);
+  border-radius: var(--ipa-r-md);
+  padding: 1rem 1.1rem;
+}
+.ipa-fault h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: #8f1616;
+  letter-spacing: -0.012em;
+}
+.ipa-fault p { margin: 0; font-size: 0.85rem; line-height: 1.55; color: #7a2020; }
+.ipa-fault-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a32626;
+  margin-bottom: 0.35rem;
+}
+
+/* Data-quality dot indicator (never colour-only: paired with a label) --- */
+.ipa-quality {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.775rem;
+  font-weight: 650;
+  color: var(--ipa-text-muted);
+}
+.ipa-quality i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ipa-success);
+  box-shadow: 0 0 0 3px var(--ipa-success-soft);
+}
+.ipa-quality[data-tone="warning"] i { background: var(--ipa-warning); box-shadow: 0 0 0 3px var(--ipa-warning-soft); }
+.ipa-quality[data-tone="critical"] i { background: var(--ipa-critical); box-shadow: 0 0 0 3px var(--ipa-critical-soft); }
+
+/* Login card ---------------------------------------------------------- */
+.ipa-login-brand { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1.1rem; }
+.ipa-login-brand h2 {
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  color: var(--ipa-ink-800);
+  margin: 0;
+}
+.ipa-login-brand p { margin: 0; font-size: 0.845rem; color: var(--ipa-text-muted); line-height: 1.5; }
+
+/* ------------------------------------------- 12 Utilities & responsive --- */
+.ipa-divider {
+  height: 1px;
+  background: var(--ipa-border);
+  border: 0;
+  margin: 1.15rem 0;
+}
+.ipa-divider--tight { margin: 0.7rem 0; }
+
+.ipa-row { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+.ipa-spacer { height: 0.35rem; }
+.ipa-two-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.8rem;
+}
+.ipa-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.755rem;
+  color: var(--ipa-text-muted);
+}
+.ipa-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.ipa-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+
+.ipa-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ipa-legacy-note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.755rem;
+  color: var(--ipa-text-subtle);
+  margin-top: 0.4rem;
+}
+
+/* Motion opt-out ------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Responsive ----------------------------------------------------------- */
+@media (max-width: 1400px) {
+  .block-container, [data-testid="stMainBlockContainer"] { padding-left: 2.2rem; padding-right: 2.2rem; }
+}
+@media (max-width: 1100px) {
+  .block-container, [data-testid="stMainBlockContainer"] { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .ipa-stat-grid { grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); }
+  .ipa-hero-overlay { padding: 1.6rem 1.5rem; }
+  .ipa-def { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .block-container, [data-testid="stMainBlockContainer"] { padding-left: 1rem; padding-right: 1rem; }
+  .ipa-page-header h1 { font-size: 1.4rem; }
+  .ipa-stat-value { font-size: 1.4rem; }
+  .ipa-kpi-value { font-size: 1.5rem; }
+  .ipa-hero-overlay h1 { font-size: 1.5rem; }
+  .ipa-note { flex-direction: column; gap: 0.55rem; }
 }
