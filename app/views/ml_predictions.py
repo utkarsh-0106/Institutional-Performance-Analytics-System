@@ -1,6 +1,9 @@
 """Machine Learning Predictions - Module 6."""
 import streamlit as st
 
+from auth.rbac import Role
+from auth.session import get_current_user
+
 from app.ui_common import load_data, page_header, section_panel, show_data_banner, widget_key
 from services.ml_service import MLService
 
@@ -24,7 +27,8 @@ def render():
     with c3:
         st.metric("Prediction Types", "3")
 
-    tab1, tab2 = st.tabs(["Batch Predictions", "Institution Predictor"])
+    is_institution = get_current_user().get("role") == Role.INSTITUTION.value
+    tab1, tab2 = st.tabs(["My Prediction" if is_institution else "Batch Predictions", "Institution Predictor"])
     with tab1:
         section_panel("Stored Prediction Results")
         if pred_df.empty:
@@ -37,6 +41,9 @@ def render():
                 st.bar_chart(pred_df["accreditation_readiness"].value_counts())
 
     with tab2:
+        if is_institution:
+            st.info("The interactive predictor is restricted to Admin and Analyst roles. Your stored prediction is shown above.")
+            return
         section_panel(
             "Predict Institutional Performance",
             "Enter institutional inputs. Predictions use the currently saved models.",

@@ -11,6 +11,7 @@ import streamlit as st
 from app.ui_common import inject_global_css
 from auth.login import render_login_page
 from auth.session import get_current_user, init_session_state, is_authenticated, logout_user
+from auth.rbac import allowed_pages, page_allowed
 from config.settings import APP_TITLE
 from services.pipeline_service import PipelineService
 
@@ -27,6 +28,7 @@ PAGES = {
     "Benchmarking": "app.views.benchmarking",
     "AI Insights": "app.views.ai_insights",
     "Reports": "app.views.reports",
+    "Admin": "app.views.admin",
 }
 
 
@@ -60,10 +62,19 @@ def render_sidebar() -> str:
         unsafe_allow_html=True,
     )
 
+    role = user.get("role")
+    visible_pages = allowed_pages(role, list(PAGES.keys()))
+    if not visible_pages:
+        st.error("No application modules are available for this account.")
+        return "Home"
+    current_page = st.session_state.get("sidebar_nav_page")
+    if current_page not in visible_pages:
+        st.session_state["sidebar_nav_page"] = visible_pages[0]
+        current_page = visible_pages[0]
     page = st.sidebar.radio(
         "Navigate",
-        list(PAGES.keys()),
-        index=0,
+        visible_pages,
+        index=visible_pages.index(current_page),
         label_visibility="collapsed",
         key="sidebar_nav_page",
     )
@@ -96,6 +107,10 @@ def ensure_pipeline():
 
 
 def render_current_page(page: str) -> None:
+    user = get_current_user()
+    if not page_allowed(user.get("role"), page):
+        st.error("Access denied for this role.")
+        return
     module_path = PAGES.get(page, PAGES["Home"])
     try:
         module = _load_page(module_path)

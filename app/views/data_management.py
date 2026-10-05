@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from auth.session import is_admin
+from auth.session import get_current_user, is_admin, record_audit
 from app.ui_common import asset_path, load_data, page_header, render_kpi_cards, section_panel, show_data_banner, widget_key
 from config.data_sources import AISHE_FILE, MERGED_DATASET_PATH, NAAC_FILE, NIRF_FILE, UGC_FILE
 from config.settings import REQUIRED_COLUMNS, SYNTHETIC_DATASET_PATH
@@ -45,6 +45,9 @@ def _show_quality_report(report: dict) -> None:
 
 
 def render():
+    if not is_admin():
+        st.error("Access denied: Data Management is available only to Admin users.")
+        return
     page_header("Data Management", "NIRF, AISHE, NAAC, UGC ingestion and analytics pipeline")
 
     data = load_data()
@@ -89,6 +92,7 @@ def render():
                 with st.spinner("Building NIRF/AISHE/NAAC/UGC raw files..."):
                     from scripts.build_real_seed_data import main as build_real
                     build_real()
+                record_audit("data_seed_build", "system", None, "Built real-data seed CSVs")
                 st.success("Raw real-data CSVs created.")
                 st.rerun()
         with col_b:
@@ -96,6 +100,7 @@ def render():
                 with st.spinner("Merging and loading into database..."):
                     from scripts.run_etl import main as run_etl
                     run_etl()
+                record_audit("etl_execution", "system", None, "Ran ETL -> SQLite")
                 st.session_state.pipeline_initialized = False
                 st.success("ETL complete.")
                 st.rerun()
@@ -138,6 +143,7 @@ def render():
                         if result.get("success"):
                             st.success(f"Upload successful — processed **{result['institutions']} institutions**.")
                             st.info("The analytics database has been updated. Refreshing the dashboard with the new data…")
+                            record_audit("data_upload", "dataset", uploaded.name, f"Processed {result.get('institutions', 0)} institutions")
                             st.session_state.pipeline_initialized = True
                             st.rerun()
                         else:
@@ -169,6 +175,7 @@ def render():
             if result.get("success"):
                 st.success(f"Done — source: **{result.get('data_source', 'unknown')}**")
                 st.metric("Institutions Processed", result["institutions"])
+                record_audit("analytics_pipeline", "system", None, f"Source={result.get('data_source', 'unknown')}; institutions={result.get('institutions', 0)}")
                 st.session_state.pipeline_initialized = True
                 if result.get("ml_metrics"):
                     st.json(result["ml_metrics"])
@@ -182,6 +189,7 @@ def render():
             with st.spinner("Training models from current institution and KPI data..."):
                 result = PipelineService().train_ml_models()
             if result.get("success"):
+                record_audit("ml_training", "system", None, f"Trained on {result['institutions']} institutions")
                 st.success(f"Trained on {result['institutions']} institutions.")
                 if result.get("ml_metrics"):
                     st.json(result["ml_metrics"])

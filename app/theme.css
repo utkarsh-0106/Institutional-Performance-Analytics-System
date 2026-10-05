@@ -2280,3 +2280,96 @@ section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
   .ipa-stat { min-height: 108px; padding: .9rem; }
   .ipa-stat-value { font-size: 1.65rem; }
 }
+
+
+/* ------------------------------------------------ Role access summary ---- */
+.ipa-role-access-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding-bottom: 0.9rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--ipa-border);
+}
+.ipa-role-access-title {
+  color: var(--ipa-ink-800);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.ipa-role-access-summary {
+  margin-top: 0.25rem;
+  color: var(--ipa-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  max-width: 72ch;
+}
+.ipa-role-access-meta {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 0.38rem;
+  flex: 0 0 auto;
+  color: var(--ipa-text-subtle);
+  font-size: 0.72rem;
+  text-align: right;
+}
+.ipa-access-list-title {
+  color: var(--ipa-ink-800);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
+.ipa-access-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ipa-access-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: var(--ipa-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  padding: 0.28rem 0;
+}
+.ipa-access-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.7rem;
+  margin-top: 0.02rem;
+}
+.ipa-access-icon.allowed {
+  background: var(--ipa-success-soft);
+  color: var(--ipa-success);
+}
+.ipa-access-icon.restricted {
+  background: var(--ipa-critical-soft);
+  color: var(--ipa-critical);
+}
+.ipa-access-full {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--ipa-success);
+  background: var(--ipa-success-soft);
+  border: 1px solid rgba(15, 138, 95, 0.16);
+  border-radius: var(--ipa-r-sm);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+@media (max-width: 800px) {
+  .ipa-role-access-head { flex-direction: column; }
+  .ipa-role-access-meta { align-items: flex-start; text-align: left; }
+}

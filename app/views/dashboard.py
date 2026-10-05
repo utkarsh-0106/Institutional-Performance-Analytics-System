@@ -181,25 +181,22 @@ def _render_top_institutions(kpi_df: pd.DataFrame) -> None:
     for _, row in frame.iterrows():
         category = str(row.get("ranking_category", ""))
         rows.append(
-            f"""
-            <tr>
-              <td><span class="ipa-rank-badge">{int(row.get('institution_rank', 0))}</span></td>
-              <td><strong>{_safe_text(row.get('institution_name', ''))}</strong></td>
-              <td class="ipa-table-score">{float(row.get('composite_rank_score', 0)):.1f}</td>
-              <td>{ui.badge(category or 'Unclassified', _ranking_category_tone(category))}</td>
-            </tr>
-            """
+            f"""<tr>
+<td><span class="ipa-rank-badge">{int(row.get('institution_rank', 0))}</span></td>
+<td><strong>{_safe_text(row.get('institution_name', ''))}</strong></td>
+<td class="ipa-table-score">{float(row.get('composite_rank_score', 0)):.1f}</td>
+<td>{ui.badge(category or 'Unclassified', _ranking_category_tone(category))}</td>
+</tr>"""
         )
-    ui.html(
-        """
-        <div class="ipa-ranking-table-wrap">
-          <table class="ipa-ranking-table">
-            <thead><tr><th>#</th><th>Institution</th><th>Score</th><th>Category</th></tr></thead>
-            <tbody>""" + "".join(rows) + """</tbody>
-          </table>
-        </div>
-        """
+    markup = (
+        '<div class="ipa-ranking-table-wrap">'
+        '<table class="ipa-ranking-table">'
+        '<thead><tr><th>#</th><th>Institution</th><th>Score</th><th>Category</th></tr></thead>'
+        '<tbody>' + "".join(rows) + '</tbody>'
+        '</table>'
+        '</div>'
     )
+    ui.html(markup)
 
 
 def _render_insights(inst_df: pd.DataFrame, kpi_df: pd.DataFrame) -> None:

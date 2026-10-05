@@ -5,7 +5,7 @@ import pandas as pd
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
-from database.models import Institution, InstitutionKPI, MLPrediction, Recommendation, User
+from database.models import AuditLog, Institution, InstitutionKPI, MLPrediction, Recommendation, User
 
 
 class InstitutionRepository:
@@ -189,7 +189,16 @@ class UserRepository:
             "role": user.role,
             "password_hash": user.password_hash,
             "linked_institution": user.linked_institution,
+            "institution_id": user.institution_id,
         }
+
+    @staticmethod
+    def get_by_id(session: Session, user_id: int) -> Optional[User]:
+        return session.query(User).filter(User.id == user_id).first()
+
+    @staticmethod
+    def get_all(session: Session) -> List[User]:
+        return session.query(User).order_by(User.username).all()
 
     @staticmethod
     def get_by_username(session: Session, username: str) -> Optional[User]:
@@ -203,14 +212,29 @@ class UserRepository:
         return UserRepository.user_to_dict(user)
 
     @staticmethod
-    def create_user(session: Session, username: str, password_hash: str, role: str, linked_institution: str = None) -> User:
+    def create_user(session: Session, username: str, password_hash: str, role: str, linked_institution: str = None, institution_id: int = None) -> User:
         user = User(
             username=username,
             password_hash=password_hash,
             role=role,
             linked_institution=linked_institution,
+            institution_id=institution_id,
         )
         session.add(user)
+        session.flush()
+        return user
+
+    @staticmethod
+    def update_user(session: Session, user: User, *, role: str, institution_id: int | None, linked_institution: str | None) -> User:
+        user.role = role
+        user.institution_id = institution_id
+        user.linked_institution = linked_institution
+        session.flush()
+        return user
+
+    @staticmethod
+    def set_password(session: Session, user: User, password_hash: str) -> User:
+        user.password_hash = password_hash
         session.flush()
         return user
 
@@ -224,4 +248,21 @@ class UserRepository:
                     password_hash=hash_fn(info["password"]),
                     role=info["role"],
                     linked_institution=info.get("institution"),
+                    institution_id=info.get("institution_id"),
                 )
+
+
+class AuditRepository:
+    @staticmethod
+    def add(session: Session, user_id: int | None, username: str | None, action: str, target_type: str | None = None, target_id: str | None = None, details: str | None = None) -> AuditLog:
+        entry = AuditLog(
+            user_id=user_id, username=username, action=action,
+            target_type=target_type, target_id=target_id, details=details,
+        )
+        session.add(entry)
+        session.flush()
+        return entry
+
+    @staticmethod
+    def get_recent(session: Session, limit: int = 200) -> List[AuditLog]:
+        return session.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(limit).all()

@@ -12,6 +12,7 @@ from app.components import ui
 from app.components.charts import ranking_distribution_chart
 from app.ui_common import load_data, safe_plotly, show_data_banner, widget_key
 from auth.session import get_current_user
+from auth.rbac import Role, page_allowed
 from services.insights_service import InsightsService
 
 
@@ -26,6 +27,104 @@ def _image_uri(filename: str) -> str:
     return "data:image/jpeg;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
 
 
+
+ROLE_ACCESS = {
+    Role.ADMIN.value: {
+        "label": "ADMIN",
+        "title": "System Administrator",
+        "summary": "Full system-management access across users, institutions, data operations, and analytics.",
+        "tone": "primary",
+        "can": [
+            "User and role management",
+            "Institution management and assignments",
+            "Data management and ETL",
+            "System-wide analytics and data quality",
+            "Rankings, benchmarking, ML, AI insights, recommendations, and reports",
+            "Audit logs and system administration",
+        ],
+        "cannot": [],
+    },
+    Role.ANALYST.value: {
+        "label": "ANALYST",
+        "title": "Analytics User",
+        "summary": "System-wide analytical access across all institutions, without administrative controls.",
+        "tone": "accent",
+        "can": [
+            "View and analyze all institutions",
+            "KPI analytics, rankings, and institution comparisons",
+            "Benchmarking and historical performance",
+            "ML predictions and recommendations",
+            "AI insights and analytical reports",
+        ],
+        "cannot": [
+            "User and role management",
+            "Institution assignments",
+            "Data administration and ETL",
+            "Audit-log and system administration",
+        ],
+    },
+    Role.INSTITUTION.value: {
+        "label": "INSTITUTION",
+        "title": "Institution User",
+        "summary": "Personalized analytical access limited to the institution assigned to this account.",
+        "tone": "success",
+        "can": [
+            "View your institution dashboard and KPIs",
+            "View your ranking and permitted benchmarking",
+            "View historical performance",
+            "View ML predictions and recommendations",
+            "View AI insights and generate your reports",
+        ],
+        "cannot": [
+            "View other institutions' institution-specific data",
+            "Manage users, roles, or institution assignments",
+            "Perform data administration or ETL",
+            "Access audit logs or system settings",
+        ],
+    },
+}
+
+
+def _role_access_panel(user: dict) -> None:
+    """Explain the authenticated user's role and access scope on Home."""
+    role = str(user.get("role") or "").upper()
+    profile = ROLE_ACCESS.get(role)
+    if not profile:
+        return
+
+    linked = user.get("linked_institution")
+    scope = "System-wide scope" if role in {Role.ADMIN.value, Role.ANALYST.value} else f"Assigned scope · {linked or 'Institution not assigned'}"
+
+    ui.html(
+        '<div class="ipa-exec-section-head ipa-section-tight">'
+        '<div><span>YOUR ACCESS</span><small>Permissions are determined by your authenticated role</small></div>'
+        '</div>'
+    )
+
+    badge = ui.badge(profile["label"], profile["tone"])
+    with ui.card(variant="quiet"):
+        ui.html(
+            f'<div class="ipa-role-access-head">'
+            f'<div><div class="ipa-role-access-title">{_safe(profile["title"])}</div>'
+            f'<div class="ipa-role-access-summary">{_safe(profile["summary"])}</div></div>'
+            f'<div class="ipa-role-access-meta">{badge}<span>{_safe(scope)}</span></div>'
+            f'</div>'
+        )
+        can_items = "".join(f'<li><span class="ipa-access-icon allowed">✓</span>{_safe(item)}</li>' for item in profile["can"])
+        cannot_items = "".join(f'<li><span class="ipa-access-icon restricted">×</span>{_safe(item)}</li>' for item in profile["cannot"])
+        c1, c2 = st.columns(2, gap="large")
+        with c1:
+            st.markdown('<div class="ipa-access-list-title">You can access</div>', unsafe_allow_html=True)
+            st.markdown(f'<ul class="ipa-access-list">{can_items}</ul>', unsafe_allow_html=True)
+        with c2:
+            if cannot_items:
+                st.markdown('<div class="ipa-access-list-title">Restricted</div>', unsafe_allow_html=True)
+                st.markdown(f'<ul class="ipa-access-list">{cannot_items}</ul>', unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="ipa-access-list-title">Access level</div>', unsafe_allow_html=True)
+                st.markdown('<div class="ipa-access-full">✓ Full system access</div>', unsafe_allow_html=True)
+
+
 def _topbar(user, inst_df: pd.DataFrame, kpi_df: pd.DataFrame) -> None:
     """Interactive product header backed only by current session/data."""
     name = _safe(user.get("username", "User"))
@@ -37,7 +136,10 @@ def _topbar(user, inst_df: pd.DataFrame, kpi_df: pd.DataFrame) -> None:
 
     left, search_col, notif_col, profile_col = st.columns([1.15, 4.7, .65, 1.7], gap="small", vertical_alignment="center")
     with left:
-        ui.html('<div class="ipa-topbar-context"><span>EXECUTIVE</span><small>Analytics workspace</small></div>')
+        ui.html(
+            f'<div class="ipa-topbar-context"><span>EXECUTIVE</span>'
+            f'<small>Analytics workspace · {role}</small></div>'
+        )
     with search_col:
         query = st.text_input(
             "Global search",
@@ -118,22 +220,25 @@ def _hero(user, total: int) -> None:
     """)
 
 
-def _quick_actions() -> None:
-    ui.html('<div class="ipa-exec-section-head ipa-section-tight"><div><span>QUICK ACTIONS</span><small>Move directly into a decision workflow</small></div></div>')
-    cols = st.columns(4, gap="medium")
-    actions = [
+def _quick_actions(user: dict) -> None:
+    ui.html('<div class="ipa-exec-section-head ipa-section-tight"><div><span>QUICK ACTIONS</span><small>Move directly into a permitted decision workflow</small></div></div>')
+    all_actions = [
         ("⇧", "Upload Data", "Validate and process institutional sources", "Data Management", "blue"),
         ("▥", "View Rankings", "Explore weighted performance rankings", "Rankings", "green"),
         ("⌁", "ML Predictions", "Review model-based outputs", "ML Predictions", "amber"),
         ("▤", "Generate Report", "Create an evidence-based report", "Reports", "red"),
     ]
+    actions = [item for item in all_actions if page_allowed(user.get("role"), item[3])]
+    if not actions:
+        st.info("No quick actions are available for this role.")
+        return
+    cols = st.columns(min(4, len(actions)), gap="medium")
     for col, (icon, title, desc, page, tone) in zip(cols, actions):
         with col:
             st.markdown(f'<div class="ipa-action-shell {tone}"><span class="ipa-action-icon">{icon}</span><div><strong>{_safe(title)}</strong><small>{_safe(desc)}</small></div></div>', unsafe_allow_html=True)
             if st.button("Open workspace", key=widget_key("home-action", page), use_container_width=True):
                 st.session_state["sidebar_nav_page"] = page
                 st.rerun()
-
 
 def _headline_stats(inst_df: pd.DataFrame, kpi_df: pd.DataFrame) -> None:
     total = len(inst_df)
@@ -217,7 +322,8 @@ def render():
     _topbar(user, inst_df, kpi_df)
     _hero(user, total)
     show_data_banner(data)
-    _quick_actions()
+    _role_access_panel(user)
+    _quick_actions(user)
 
     ui.html('<div class="ipa-exec-section-head"><div><span>PERFORMANCE SNAPSHOT</span><small>Live values from the current dataset</small></div></div>')
     _headline_stats(inst_df, kpi_df)

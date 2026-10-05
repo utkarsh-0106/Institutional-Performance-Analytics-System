@@ -51,7 +51,8 @@ def render_login_page():
 
         with st.expander("Demo Credentials"):
             st.markdown("""
-            **Admin:** username `admin` / password `admin123`  
-            **Institution User:** username `institution_user` / password `user123`
+            **Admin:** `admin` / `admin123`
+            **Analyst:** `analyst` / `analyst123`
+            **Institution:** `institution_user` / `user123`
             """)
         st.markdown("</div>", unsafe_allow_html=True)

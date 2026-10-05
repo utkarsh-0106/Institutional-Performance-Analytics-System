@@ -12,6 +12,8 @@ import plotly.express as px
 
 from app.components import ui
 from services.pipeline_service import PipelineService
+from services.access_control import scope_data_for_user
+from auth.session import get_current_user
 
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 THEME_CSS_PATH = Path(__file__).resolve().parent / "theme.css"
@@ -122,13 +124,17 @@ def load_data() -> dict:
         data["predictions"] = data.get("predictions", pd.DataFrame())
         data["recommendations"] = data.get("recommendations", pd.DataFrame())
         data["using_sample"] = False
+        data = scope_data_for_user(data, get_current_user())
         if data["predictions"].empty or data["recommendations"].empty:
             data["partial_data"] = True
         else:
             data["partial_data"] = False
         return data
     except Exception as exc:
-        return _sample_data_bundle(f"Could not load database: {exc}")
+        try:
+            return scope_data_for_user(_sample_data_bundle(f"Could not load database: {exc}"), get_current_user())
+        except PermissionError:
+            raise
 
 
 def _sample_data_bundle(info_msg: str) -> dict:

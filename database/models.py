@@ -67,6 +67,19 @@ class Recommendation(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, nullable=True, index=True)
+    username = Column(String(100), nullable=True, index=True)
+    action = Column(String(100), nullable=False, index=True)
+    target_type = Column(String(50), nullable=True)
+    target_id = Column(String(100), nullable=True)
+    details = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -75,4 +88,5 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(String(50), default="institution_user")
     linked_institution = Column(String(255), nullable=True)
+    institution_id = Column(Integer, nullable=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)

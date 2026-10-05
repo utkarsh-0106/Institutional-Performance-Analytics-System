@@ -4,6 +4,7 @@ from typing import Optional
 from config.settings import DEFAULT_USERS
 from database.session import get_db_session, init_db
 from database.repositories import UserRepository
+from auth.rbac import normalize_role
 from utils.helpers import hash_password, verify_password
 
 
@@ -14,9 +15,10 @@ def _default_user_dict(username: str) -> Optional[dict]:
     return {
         "id": 0,
         "username": username,
-        "role": info["role"],
+        "role": normalize_role(info["role"]),
         "password_hash": hash_password(info["password"]),
         "linked_institution": info.get("institution"),
+        "institution_id": info.get("institution_id"),
     }
 
 
@@ -40,8 +42,9 @@ def authenticate_user(username: str, password: str) -> Optional[dict]:
             return {
                 "id": user_dict["id"],
                 "username": user_dict["username"],
-                "role": user_dict["role"],
+                "role": normalize_role(user_dict["role"]),
                 "linked_institution": user_dict.get("linked_institution"),
+                "institution_id": user_dict.get("institution_id"),
             }
         return None
 
@@ -50,8 +53,9 @@ def authenticate_user(username: str, password: str) -> Optional[dict]:
         return {
             "id": fallback["id"],
             "username": fallback["username"],
-            "role": fallback["role"],
+            "role": normalize_role(fallback["role"]),
             "linked_institution": fallback.get("linked_institution"),
+            "institution_id": fallback.get("institution_id"),
         }
 
     return None

@@ -76,9 +76,12 @@ RANKING_WEIGHTS = {
 ACCREDITATION_GRADE_MAP = {"A++": 100, "A+": 90, "A": 80, "B++": 70, "B+": 60, "B": 50, "C": 40, "NA": 30}
 
 DEFAULT_USERS = {
-    "admin": {"password": "admin123", "role": "admin", "institution": None},
-    "institution_user": {"password": "user123", "role": "institution_user", "institution": "Indian Institute of Technology Bombay"},
+    "admin": {"password": "admin123", "role": "ADMIN", "institution": None},
+    "analyst": {"password": "analyst123", "role": "ANALYST", "institution": None},
+    "institution_user": {"password": "user123", "role": "INSTITUTION", "institution": "Indian Institute of Technology Bombay"},
 }
+
+RBAC_ROLES = ("ADMIN", "ANALYST", "INSTITUTION")
 
 APP_TITLE = "Institutional Performance Analytics System"
 APP_SUBTITLE = "SIH 2025 | Problem ID: SIH25253 | UGC & AICTE Institutional Analytics"

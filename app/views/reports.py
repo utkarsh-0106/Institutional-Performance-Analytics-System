@@ -2,7 +2,7 @@
 import streamlit as st
 
 from app.ui_common import load_data, page_header, section_panel, show_data_banner, widget_key
-from auth.session import get_current_user
+from auth.session import get_current_user, record_audit
 from services.insights_service import InsightsService
 from services.report_service import ReportService
 
@@ -201,6 +201,8 @@ def render():
                         insights=insights,
                     )
                 )
+
+            record_audit("report_generation", "institution", selected, f"Generated {path.name}")
 
             st.success(
                 f"✅ Report generated successfully: {path.name}"
