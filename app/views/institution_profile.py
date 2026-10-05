@@ -510,7 +510,9 @@ def render() -> None:
     user = st.session_state.get("user") or {}
     if isinstance(user, dict):
         linked = user.get("linked_institution")
-    default = choices.index(linked) if linked in choices else 0
+    requested = st.session_state.get("institution_profile_selection")
+    preferred = requested if requested in choices else linked
+    default = choices.index(preferred) if preferred in choices else 0
 
     selected = st.selectbox(
         "Select an institution",

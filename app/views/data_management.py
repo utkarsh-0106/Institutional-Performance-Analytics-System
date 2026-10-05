@@ -2,13 +2,14 @@
 import tempfile
 from pathlib import Path
 
+
 import pandas as pd
 import streamlit as st
 
 from auth.session import is_admin
 from app.ui_common import asset_path, load_data, page_header, render_kpi_cards, section_panel, show_data_banner, widget_key
 from config.data_sources import AISHE_FILE, MERGED_DATASET_PATH, NAAC_FILE, NIRF_FILE, UGC_FILE
-from config.settings import SYNTHETIC_DATASET_PATH
+from config.settings import REQUIRED_COLUMNS, SYNTHETIC_DATASET_PATH
 from services.etl.pipeline import ETLPipeline
 from services.pipeline_service import PipelineService
 
@@ -101,32 +102,61 @@ def render():
 
     with tab2:
         st.subheader("Upload CSV or Excel")
+        st.caption("Import institutional records into the existing analytics pipeline. The upload is validated before it can change the database.")
+
         if is_admin():
             uploaded = st.file_uploader(
-                "Choose file",
+                "Choose a CSV or Excel file",
                 type=["csv", "xlsx", "xls"],
                 key=widget_key("data_mgmt", "uploader"),
+                help="Required fields: institution name, student enrollment, faculty count, placement percentage, research publications, infrastructure score, accreditation grade, and NIRF rank.",
             )
-            if uploaded:
-                suffix = Path(uploaded.name).suffix
-                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-                    tmp.write(uploaded.getvalue())
-                    tmp_path = Path(tmp.name)
-                file_type = "excel" if suffix in [".xlsx", ".xls"] else "csv"
-                if st.button("Upload & Process", type="primary", key=widget_key("data_mgmt", "upload_btn")):
-                    with st.spinner("Validating and processing..."):
-                        result = PipelineService().load_uploaded_file(tmp_path, file_type)
-                    if result.get("quality_report"):
-                        st.session_state.data_quality_report = result["quality_report"]
-                    if result.get("success"):
-                        st.success(f"Processed {result['institutions']} institutions.")
-                        st.session_state.pipeline_initialized = False
-                        st.rerun()
-                    else:
-                        st.error(result.get("errors", ["Processing failed"]))
-                        _show_quality_report(result.get("quality_report") or {})
+
+            required_display = ", ".join(col.replace("_", " ").title() for col in REQUIRED_COLUMNS)
+            st.caption(f"Required fields: {required_display}")
+
+            if uploaded is None:
+                st.info("Select a CSV or Excel file above. The **Upload & Process** action appears after a file is selected.")
+            else:
+                suffix = Path(uploaded.name).suffix.lower()
+                file_type = "excel" if suffix in {".xlsx", ".xls"} else "csv"
+                st.success(f"Ready: **{uploaded.name}** ({uploaded.size:,} bytes)")
+
+                if st.button("Upload & Process", type="primary", key=widget_key("data_mgmt", "upload_btn"), use_container_width=True):
+                    tmp_path = None
+                    try:
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                            tmp.write(uploaded.getvalue())
+                            tmp_path = Path(tmp.name)
+
+                        with st.spinner("Reading, validating, cleaning, and processing the uploaded data..."):
+                            result = PipelineService().load_uploaded_file(tmp_path, file_type)
+
+                        if result.get("quality_report"):
+                            st.session_state.data_quality_report = result["quality_report"]
+
+                        if result.get("success"):
+                            st.success(f"Upload successful — processed **{result['institutions']} institutions**.")
+                            st.info("The analytics database has been updated. Refreshing the dashboard with the new data…")
+                            st.session_state.pipeline_initialized = True
+                            st.rerun()
+                        else:
+                            errors = result.get("errors") or ["Processing failed."]
+                            st.error("Upload was not applied because validation failed.")
+                            for error in errors:
+                                st.write(f"• {error}")
+                            _show_quality_report(result.get("quality_report") or {})
+                    except Exception as exc:
+                        st.error(f"Upload failed: {exc}")
+                        st.caption("No intentional database update was completed by this upload attempt. Check the file format and required columns, then try again.")
+                    finally:
+                        if tmp_path is not None:
+                            try:
+                                tmp_path.unlink(missing_ok=True)
+                            except OSError:
+                                pass
         else:
-            st.warning("Upload restricted to Admin role.")
+            st.warning("Upload is available only to Admin users. Sign in as **admin** to import data.")
 
     with tab3:
         st.subheader("Run Analytics Pipeline")

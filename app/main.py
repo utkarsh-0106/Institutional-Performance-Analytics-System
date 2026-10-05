@@ -39,9 +39,13 @@ def render_sidebar() -> str:
     st.sidebar.markdown(
         """
         <div class="ipa-brand">
-            <h2>Institutional Analytics</h2>
-            <p>Higher Education Intelligence</p>
+            <div class="ipa-brand-mark"><span>IP</span></div>
+            <div>
+                <h2>IPAS</h2>
+                <p>Institutional Performance Analytics</p>
+            </div>
         </div>
+        <div class="ipa-side-label">Workspace</div>
         """,
         unsafe_allow_html=True,
     )
@@ -51,21 +55,28 @@ def render_sidebar() -> str:
         return "Home"
 
     user = get_current_user()
-    st.sidebar.caption(f"Signed in as {user.get('username', '')}")
-    st.sidebar.caption(f"Role · {user.get('role', '')}")
-    if user.get("linked_institution"):
-        st.sidebar.caption(user["linked_institution"])
+    st.sidebar.markdown(
+        f"<div class=\"ipa-sidebar-user\"><strong>{user.get('username', '')}</strong><span>{str(user.get('role', '')).replace('_', ' ').title()}</span></div>",
+        unsafe_allow_html=True,
+    )
 
-    st.sidebar.markdown("")
     page = st.sidebar.radio(
         "Navigate",
         list(PAGES.keys()),
         index=0,
-        label_visibility="visible",
+        label_visibility="collapsed",
         key="sidebar_nav_page",
     )
 
-    if st.sidebar.button("Logout", use_container_width=True):
+    st.sidebar.markdown('<div class="ipa-side-label">System</div>', unsafe_allow_html=True)
+    if user.get("linked_institution"):
+        st.sidebar.caption(f"Institution · {user['linked_institution']}")
+    st.sidebar.markdown(
+        '<div class="ipa-side-source"><strong>Data sources</strong><span>UGC · NIRF · AISHE · NAAC</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.sidebar.button("Sign out", use_container_width=True):
         logout_user()
         st.rerun()
 
