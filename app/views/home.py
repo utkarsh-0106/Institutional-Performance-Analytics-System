@@ -158,7 +158,7 @@ def _topbar(user, inst_df: pd.DataFrame, kpi_df: pd.DataFrame) -> None:
                 )
                 if st.button("Open institution profile", key=widget_key("home", "open-search"), type="primary"):
                     st.session_state["institution_profile_selection"] = selected
-                    st.session_state["sidebar_nav_page"] = "Institution Profile"
+                    st.session_state["pending_nav_page"] = "Institution Profile"
                     st.rerun()
             else:
                 st.caption("No institutions match the current search.")
@@ -183,7 +183,7 @@ def _topbar(user, inst_df: pd.DataFrame, kpi_df: pd.DataFrame) -> None:
             if st.button("View institution profile", key=widget_key("home", "profile-menu"), use_container_width=True):
                 if linked:
                     st.session_state["institution_profile_selection"] = linked
-                st.session_state["sidebar_nav_page"] = "Institution Profile"
+                st.session_state["pending_nav_page"] = "Institution Profile"
                 st.rerun()
             if st.button("Sign out", key=widget_key("home", "sign-out"), use_container_width=True):
                 from auth.session import logout_user
@@ -237,7 +237,7 @@ def _quick_actions(user: dict) -> None:
         with col:
             st.markdown(f'<div class="ipa-action-shell {tone}"><span class="ipa-action-icon">{icon}</span><div><strong>{_safe(title)}</strong><small>{_safe(desc)}</small></div></div>', unsafe_allow_html=True)
             if st.button("Open workspace", key=widget_key("home-action", page), use_container_width=True):
-                st.session_state["sidebar_nav_page"] = page
+                st.session_state["pending_nav_page"] = page
                 st.rerun()
 
 def _headline_stats(inst_df: pd.DataFrame, kpi_df: pd.DataFrame) -> None:
@@ -307,7 +307,7 @@ def _top_institutions(kpi_df: pd.DataFrame) -> None:
         with c4:
             if st.button("View profile", key=widget_key("home-top", idx), use_container_width=True):
                 st.session_state["institution_profile_selection"] = name
-                st.session_state["sidebar_nav_page"] = "Institution Profile"
+                st.session_state["pending_nav_page"] = "Institution Profile"
                 st.rerun()
         if idx < len(frame):
             st.divider()

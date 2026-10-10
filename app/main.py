@@ -67,6 +67,10 @@ def render_sidebar() -> str:
     if not visible_pages:
         st.error("No application modules are available for this account.")
         return "Home"
+    pending_page = st.session_state.pop("pending_nav_page", None)
+    if pending_page in visible_pages:
+        st.session_state["sidebar_nav_page"] = pending_page
+
     current_page = st.session_state.get("sidebar_nav_page")
     if current_page not in visible_pages:
         st.session_state["sidebar_nav_page"] = visible_pages[0]
